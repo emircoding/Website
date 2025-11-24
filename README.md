@@ -3,7 +3,7 @@
 Eine moderne, responsive Landing Page für eine KI-Automationsplattform, die wie ein Full-Stack-Entwickler im Hintergrund arbeitet. Die Seite präsentiert eine Next.js/Tailwind-inspirierte Oberfläche mit viel Weißraum, Glass-Effekten und klaren Komponenten.
 
 ## Features
-- Hero, Fähigkeiten, Pipeline, Erlebnis, Workflows, Pricing, FAQ und Kontakt – alles sofort einsatzbereit.
+- Hero, Fähigkeiten, Pipeline, Task-Modell, Login & Sicherheit, Erlebnis, Workflows, Pricing, FAQ und Kontakt – alles sofort einsatzbereit.
 - Mobile Navigation mit Toggle, Sticky Header, FAQ-Akkordeon und Formular-Feedback.
 - Design-Tokens (Farben, Radien, Schatten) und responsive Grids für konsistentes Layout.
 - Copy fokussiert auf Natural-Language-Input, Task-Modell, Entscheidungs-Engine, Integrationsadapter und OAuth Login.

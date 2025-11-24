@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,6 +24,8 @@
         <a href="#platform">Plattform</a>
         <a href="#capabilities">Fähigkeiten</a>
         <a href="#pipeline">Pipeline</a>
+        <a href="#task-model">Task-Modell</a>
+        <a href="#security">Login & Sicherheit</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
         <a class="pill" href="#contact">Kontakt</a>
@@ -37,20 +39,25 @@
         <div class="hero-grid">
           <div class="hero-copy">
             <p class="eyebrow">KI-Automation wie ein Full-Stack-Entwickler</p>
-            <h1>Natural Language rein, fertige Weblogik und Workflows raus.</h1>
-            <p class="lede">Atria interpretiert deine Anforderungen, zerlegt sie in technische Tasks und liefert automatisch geplante, implementierte und überwachte Abläufe – ohne dass du Code oder Infrastruktur anfassen musst.</p>
+            <h1>Natural Language rein, fertige Weblogik, Integrationen und Workflows raus.</h1>
+            <p class="lede">Atria interpretiert deine Anforderungen, zerlegt sie in technische Tasks und liefert automatisch geplante, implementierte und überwachte Abläufe – ohne dass du Code, Auth-Flows oder Infrastruktur anfassen musst.</p>
             <div class="actions">
               <a class="btn primary" href="#contact">Jetzt Demo sichern</a>
               <a class="btn ghost" href="#capabilities">Alle Fähigkeiten</a>
             </div>
             <div class="trust">Arbeitet wie ein erfahrener Full-Stack-Dev im Hintergrund – nur schneller, skalierbarer und transparent.</div>
+            <div class="pill-row">
+              <span class="pill-badge">OAuth Login & Sessions</span>
+              <span class="pill-badge">Typisierte Tasks</span>
+              <span class="pill-badge">Audit-Logs & Replays</span>
+            </div>
           </div>
           <div class="hero-card">
             <p class="label">Was Atria für dich erledigt</p>
             <ul class="checklist">
               <li>Semantische Analyse von Eingaben & Intent-Erkennung</li>
               <li>Strukturiertes Task-Modell mit Typ, Status, Priorität, Zielsystem</li>
-              <li>Automatische Planung, Ausführung, Validierung und Protokollierung</li>
+              <li>Automatische Planung, Ausführung, Validierung, Logging und Replays</li>
               <li>Dashboard mit Chat, OAuth Login, Sessions und Audit-Log</li>
             </ul>
             <div class="stats">
@@ -151,6 +158,48 @@
       </div>
     </section>
 
+    <section class="section" id="task-model">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Task-Modell</p>
+          <h2>Klar typisiert, versionierbar und bereit für Governance.</h2>
+          <p class="muted">Jede Eingabe wird in ein standardisiertes Modell überführt – ideal für Automationen, Audits und spätere Erweiterungen.</p>
+        </div>
+        <div class="task-grid">
+          <article class="card task-card">
+            <div class="icon">🧭</div>
+            <h3>Felder & Typen</h3>
+            <ul class="task-fields">
+              <li><strong>Typ:</strong> Termin, Anruf, Nachricht, Routine, Systemaktion</li>
+              <li><strong>Status:</strong> Entwurf, geplant, aktiv, validiert, abgeschlossen</li>
+              <li><strong>Priorität:</strong> Niedrig, Normal, Hoch, Kritisch</li>
+              <li><strong>Kontext:</strong> Ersteller, Zielsystem, benötigte Berechtigungen</li>
+            </ul>
+          </article>
+          <article class="card task-card">
+            <div class="icon">📐</div>
+            <h3>Validierung & Nachvollziehbarkeit</h3>
+            <p>Jeder Task bekommt Checkpoints, Error-Handling, Replay-Informationen und ein Audit-Log. So sind Entscheidungen und Schritte jederzeit prüfbar.</p>
+            <div class="chip-row">
+              <span class="chip">Checkpoints</span>
+              <span class="chip">Audit-Events</span>
+              <span class="chip">Retries</span>
+            </div>
+          </article>
+          <article class="card task-card">
+            <div class="icon">⚙️</div>
+            <h3>Planung & Ausführung</h3>
+            <p>Die Entscheidungs-Engine kombiniert Regeln, Modelle und Integrationsdaten, um die nächsten Schritte automatisch zu orchestrieren – von API-Calls bis zu Telefonie.</p>
+            <div class="badge-list">
+              <span class="badge">Regelwerk</span>
+              <span class="badge">ML-Modelle</span>
+              <span class="badge">Adapter-Metadaten</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="experience">
       <div class="container">
         <div class="section-header">
@@ -178,6 +227,38 @@
             <div class="icon">🔒</div>
             <h3>OAuth Login</h3>
             <p>Sichere Anmeldung über Google, Apple oder E-Mail. Sessions, Token-Rollover und Redirect ins personalisierte Dashboard inklusive.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="security">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Login & Sicherheit</p>
+          <h2>Von OAuth bis Audit-Log: Sicherheit als Standard.</h2>
+          <p class="muted">Tokens, Sessions, Rollen und Freigaben werden sauber verwaltet – mit klaren UI-Stati und sofortigen Redirects ins Dashboard.</p>
+        </div>
+        <div class="grid cards security-grid">
+          <article class="card">
+            <div class="icon">🔑</div>
+            <h3>OAuth Flows</h3>
+            <p>Login mit Google, Apple oder E-Mail. Token-Rollover, Refresh und Session-Handling sind vorbereitet.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🛡️</div>
+            <h3>Berechtigungen</h3>
+            <p>Vor jeder kritischen Aktion prüft ein Security-Layer Freigaben, Rollen und Konfigurationen.</p>
+          </article>
+          <article class="card">
+            <div class="icon">📜</div>
+            <h3>Audit-Log</h3>
+            <p>Jeder Statuswechsel und jedes Ergebnis wird mit Zeitstempel, Zielsystem und verantwortlicher KI-Aktion protokolliert.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🔄</div>
+            <h3>Replays</h3>
+            <p>Fehlerhafte Schritte lassen sich wiederholen oder auf alternative Pfade umleiten – inklusive Monitoring.</p>
           </article>
         </div>
       </div>

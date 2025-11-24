@@ -37,6 +37,8 @@ form?.addEventListener('submit', (event) => {
   event.preventDefault();
   const formData = new FormData(form);
   const name = formData.get('name');
-  feedback.textContent = name ? `Thanks, ${name}! We will reply soon.` : 'Thanks! We will reply soon.';
+  feedback.textContent = name
+    ? `Danke, ${name}! Wir melden uns in Kürze.`
+    : 'Danke! Wir melden uns in Kürze.';
   form.reset();
 });
