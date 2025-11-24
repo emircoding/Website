@@ -1,16 +1,16 @@
 :root {
-  --bg: #f7f9fb;
-  --bg-alt: #eef2ff;
-  --panel: rgba(255, 255, 255, 0.92);
-  --panel-alt: #e2e8f0;
-  --text: #0b1021;
-  --text-muted: #475569;
-  --accent: #4f46e5;
-  --accent-strong: #6366f1;
-  --accent-soft: #8b5cf6;
-  --border: rgba(15, 23, 42, 0.08);
-  --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
-  --radius: 16px;
+  --bg: #fdfefe;
+  --bg-alt: #f4f7fb;
+  --panel: rgba(255, 255, 255, 0.95);
+  --panel-alt: #edf2f7;
+  --text: #0a1024;
+  --text-muted: #4b5563;
+  --accent: #4b7bec;
+  --accent-strong: #3b5bdb;
+  --accent-soft: #9aa9ff;
+  --border: rgba(12, 20, 38, 0.08);
+  --shadow: 0 14px 40px rgba(12, 20, 38, 0.08);
+  --radius: 18px;
 }
 
 * {
@@ -20,13 +20,11 @@
 body {
   margin: 0;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
-  background:
-    radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.18), transparent 34%),
-    radial-gradient(circle at 80% 10%, rgba(99, 230, 221, 0.16), transparent 30%),
-    linear-gradient(180deg, #f8fbff 0%, #f0f4ff 60%, #eef2ff 100%);
+  background: linear-gradient(180deg, #fdfefe 0%, #f7f9fc 38%, #eef2f8 100%);
   color: var(--text);
   min-height: 100vh;
   line-height: 1.6;
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -416,8 +414,14 @@ svg {
   background: var(--panel);
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(8px);
+  box-shadow: none;
+  backdrop-filter: blur(6px);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.cards .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(12, 20, 38, 0.08);
 }
 
 .icon {

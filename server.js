@@ -6,6 +6,11 @@ const url = require('url');
 const tls = require('tls');
 const net = require('net');
 
+if (!global.fetch) {
+  throw new Error('Diese Laufzeit benötigt Node 18+ oder eine fetch-Implementierung.');
+}
+const fetch = global.fetch;
+
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const TASK_FILE = path.join(DATA_DIR, 'tasks.json');
@@ -21,15 +26,22 @@ if (!fs.existsSync(TASK_FILE)) {
 function loadTasks() {
   try {
     const content = fs.readFileSync(TASK_FILE, 'utf-8');
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    if (!Array.isArray(parsed)) throw new Error('Task-Datei ist kein Array');
+    return parsed;
   } catch (error) {
-    console.error('Kann Tasks nicht laden', error);
+    console.error('Kann Tasks nicht laden, setze leere Liste:', error.message);
+    fs.writeFileSync(TASK_FILE, '[]', 'utf-8');
     return [];
   }
 }
 
 function saveTasks(tasks) {
-  fs.writeFileSync(TASK_FILE, JSON.stringify(tasks, null, 2), 'utf-8');
+  try {
+    fs.writeFileSync(TASK_FILE, JSON.stringify(tasks, null, 2), 'utf-8');
+  } catch (error) {
+    console.error('Speichern fehlgeschlagen:', error.message);
+  }
 }
 
 function sendJson(res, status, payload) {
@@ -72,7 +84,9 @@ async function handleGoogleAuth() {
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
   const calendarId = process.env.GOOGLE_CALENDAR_ID;
   if (!clientEmail || !privateKey || !calendarId) {
-    throw new Error('Google Calendar Credentials fehlen (GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, GOOGLE_CALENDAR_ID).');
+    throw new Error(
+      'Google Calendar Credentials fehlen (GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, GOOGLE_CALENDAR_ID).'
+    );
   }
   const iat = Math.floor(Date.now() / 1000);
   const exp = iat + 3600;
@@ -133,51 +147,6 @@ async function handleCalendarCreate(task) {
   return { id: data.id, htmlLink: data.htmlLink, start: data.start, end: data.end };
 }
 
-function readResponse(socket) {
-  return new Promise((resolve) => {
-    let buffer = '';
-    const handler = (data) => {
-      buffer += data.toString();
-      if (/\r?\n/.test(buffer)) {
-        const lines = buffer.trim().split(/\r?\n/);
-        const last = lines[lines.length - 1];
-        if (/^\d{3} /.test(last)) {
-          socket.removeListener('data', handler);
-          resolve(lines.join('\n'));
-        }
-      }
-    };
-    socket.on('data', handler);
-  });
-}
-
-async function sendSmtpMail({ host, port = 587, user, pass, from, to, subject, text }) {
-  if (!host || !user || !pass || !from || !to) {
-    throw new Error('SMTP Konfiguration unvollständig (HOST, USER, PASS, FROM, TO).');
-  }
-  const useTls = port === 465 || process.env.SMTP_SECURE === 'true';
-  const socket = useTls ? tls.connect(port, host) : net.createConnection(port, host);
-
-  const send = async (command) => {
-    socket.write(`${command}\r\n`);
-    return readResponse(socket);
-  };
-
-  await readResponse(socket); // greeting
-  await send(`EHLO localhost`);
-  await send('AUTH LOGIN');
-  await send(Buffer.from(user).toString('base64'));
-  await send(Buffer.from(pass).toString('base64'));
-  await send(`MAIL FROM:<${from}>`);
-  await send(`RCPT TO:<${to}>`);
-  await send('DATA');
-  const message = `From: ${from}\r\nTo: ${to}\r\nSubject: ${subject}\r\n\r\n${text}\r\n.`;
-  await send(message);
-  await send('QUIT');
-  socket.end();
-  return { deliveredTo: to };
-}
-
 async function handleEmailSend(task) {
   const payload = task.payload || {};
   const to = payload.to || process.env.DEFAULT_MAIL_TO;
@@ -188,7 +157,55 @@ async function handleEmailSend(task) {
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
   const from = process.env.SMTP_FROM || user;
-  return sendSmtpMail({ host, port, user, pass, from, to, subject, text });
+  if (!host || !user || !pass || !from || !to) {
+    throw new Error('SMTP Konfiguration unvollständig (HOST, USER, PASS, FROM, TO).');
+  }
+
+  const useTls = port === 465 || process.env.SMTP_SECURE === 'true';
+  const socket = useTls ? tls.connect(port, host) : net.createConnection(port, host);
+
+  const read = () =>
+    new Promise((resolve, reject) => {
+      let buffer = '';
+      const timeout = setTimeout(() => {
+        socket.removeAllListeners('data');
+        reject(new Error('SMTP Timeout'));
+      }, 10000);
+      socket.once('data', (data) => {
+        clearTimeout(timeout);
+        buffer += data.toString();
+        const code = parseInt(buffer.slice(0, 3), 10);
+        resolve({ code, text: buffer.trim() });
+      });
+      socket.once('error', reject);
+    });
+
+  const send = async (command, expected) => {
+    socket.write(`${command}\r\n`);
+    const resp = await read();
+    if (expected && resp.code !== expected) {
+      throw new Error(`SMTP Fehler ${resp.code}: ${resp.text}`);
+    }
+    return resp;
+  };
+
+  try {
+    await read();
+    await send(`EHLO atria.local`, 250);
+    await send('AUTH LOGIN', 334);
+    await send(Buffer.from(user).toString('base64'), 334);
+    await send(Buffer.from(pass).toString('base64'), 235);
+    await send(`MAIL FROM:<${from}>`, 250);
+    await send(`RCPT TO:<${to}>`, 250);
+    await send('DATA', 354);
+    await send(`From: ${from}\r\nTo: ${to}\r\nSubject: ${subject}\r\n\r\n${text}\r\n.`, 250);
+    await send('QUIT');
+    socket.end();
+    return { deliveredTo: to };
+  } catch (error) {
+    socket.end();
+    throw error;
+  }
 }
 
 async function handlePriceCheck(task) {
@@ -207,6 +224,9 @@ async function handlePriceCheck(task) {
     link: item.url || item.thumbnail || item.link || '#',
     vendor: item.brand || item.store || 'Shop',
   }));
+  if (!items.length) {
+    throw new Error('Keine Angebote gefunden.');
+  }
   return { query, items };
 }
 
@@ -276,6 +296,15 @@ const server = http.createServer(async (req, res) => {
       const body = await parseBody(req);
       const description = body.description || '';
       const type = inferTaskType(description, body.type);
+      if (!description && !body.payload) {
+        sendJson(res, 400, { message: 'Beschreibung oder Payload fehlt.' });
+        return;
+      }
+      const allowedTypes = ['calendarCreate', 'emailSend', 'priceCheck', 'routine'];
+      if (!allowedTypes.includes(type)) {
+        sendJson(res, 400, { message: 'Ungültiger Task-Typ.' });
+        return;
+      }
       const now = new Date().toISOString();
       const task = {
         id: randomUUID(),

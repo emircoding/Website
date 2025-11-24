@@ -7,7 +7,7 @@ Eine moderne, responsive Website für eine KI-Automationsplattform, die wie ein 
 - Neue Sektionen für Personalisierung und Live-Logging, damit Tagesmodi (Ruhiger Start, Fokusphase, Unterwegs, Abendruhe) UI- und Integrationszustände aktiv umschalten.
 - Echtzeit-Integrationsübersicht für Kalender, Mail, WhatsApp, Slack, Notion, Telefonie mit Statuschips im iOS-inspirierten Glasdesign.
 - Mobile Navigation mit Toggle, Sticky Header, FAQ-Akkordeon, Formular-Feedback plus dynamischem Aktivitätsfeed, der Audit-Events im Frontend simuliert.
-- Design-Tokens (Farben, Radien, Schatten) und responsive Grids für konsistentes Layout auf iOS, Windows und im Web.
+- Reduzierte, luftige Gestaltung mit hellen Panels, Hover-Staten und klarer Typografie für iOS- und Windows-Layouts.
 - Copy fokussiert auf Natural-Language-Input, Task-Modell, Entscheidungs-Engine, Integrationsadapter, OAuth Login und praktische Routinen für Ruhe im Alltag.
 
 ## Struktur
@@ -28,8 +28,8 @@ Eine moderne, responsive Website für eine KI-Automationsplattform, die wie ein 
 - **Preis-Check**: Standardmäßig `https://dummyjson.com/products/search?q=<query>`. Alternativ `PRICE_FEED_URL` setzen.
 
 ## Nutzung
-1. Abhängigkeiten sind rein native Node.js-Module – kein zusätzliches `npm install` nötig.
+1. Node 18+ nutzen (wegen nativem `fetch` und moderner TLS-Unterstützung); es werden ausschließlich eingebaute Module verwendet.
 2. Environment setzen (z. B. in einer `.env` oder direkt im Shell-Export) für Kalender, Mail und Preisfeed.
 3. Server starten: `node server.js` (Standard-Port 3000).
 4. Browser öffnen: `http://localhost:3000`. Das Formular unter „Automation starten“ sendet echte Requests an `/api/task`; der Statusbereich liest `/api/tasks` und zeigt Resultate/Fehler an.
-5. Tasks werden in `data/tasks.json` persistiert und bleiben zwischen Neustarts erhalten.
+5. Tasks werden in `data/tasks.json` persistiert, fehlerhafte JSON-Inhalte werden automatisch geleert und sauber neu angelegt.

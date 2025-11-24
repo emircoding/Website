@@ -10,5 +10,8 @@
   "keywords": ["automation", "calendar", "email", "price-check"],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  }
 }
