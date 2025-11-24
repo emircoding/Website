@@ -1,0 +1,14 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "description": "Eine KI-Automationsplattform mit echter Backend-Logik für Kalender, Mail und Preisabfragen.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"No tests defined\""
+  },
+  "keywords": ["automation", "calendar", "email", "price-check"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
