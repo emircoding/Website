@@ -263,7 +263,9 @@ async function submitTask(payload) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    const data = await res.json();
+    const data = await res
+      .json()
+      .catch(() => ({ message: 'Antwort konnte nicht gelesen werden.' }));
     if (!res.ok) {
       throw new Error(data.message || 'Task fehlgeschlagen');
     }

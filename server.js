@@ -64,10 +64,39 @@ function parseBody(req) {
         const parsed = body ? JSON.parse(body) : {};
         resolve(parsed);
       } catch (error) {
-        reject(error);
+        reject(new Error('Ungültiges JSON im Request-Body.'));
       }
     });
   });
+}
+
+function validatePayload(type, body) {
+  if (!body.description && !body.payload) {
+    return 'Beschreibung oder Payload fehlt.';
+  }
+
+  if (type === 'calendarCreate') {
+    const { title, start, end } = body.payload || {};
+    if (!title || !start || !end) {
+      return 'Kalender-Task benötigt title, start und end.';
+    }
+  }
+
+  if (type === 'emailSend') {
+    const { to, subject, text } = body.payload || {};
+    if (!to || !subject || !text) {
+      return 'E-Mail-Task benötigt to, subject und text.';
+    }
+  }
+
+  if (type === 'priceCheck') {
+    const { query } = body.payload || {};
+    if (!query && !body.description) {
+      return 'Preis-Task benötigt eine Anfrage (query oder description).';
+    }
+  }
+
+  return null;
 }
 
 function inferTaskType(description = '', explicitType) {
@@ -296,13 +325,14 @@ const server = http.createServer(async (req, res) => {
       const body = await parseBody(req);
       const description = body.description || '';
       const type = inferTaskType(description, body.type);
-      if (!description && !body.payload) {
-        sendJson(res, 400, { message: 'Beschreibung oder Payload fehlt.' });
-        return;
-      }
       const allowedTypes = ['calendarCreate', 'emailSend', 'priceCheck', 'routine'];
       if (!allowedTypes.includes(type)) {
         sendJson(res, 400, { message: 'Ungültiger Task-Typ.' });
+        return;
+      }
+      const validationError = validatePayload(type, body);
+      if (validationError) {
+        sendJson(res, 400, { message: validationError });
         return;
       }
       const now = new Date().toISOString();
