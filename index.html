@@ -29,6 +29,7 @@
         <a href="#integrations">Integrationen</a>
         <a href="#security">Sicherheit</a>
         <a href="#daily">Alltag</a>
+        <a href="#tasks">Status</a>
         <a href="#faq">FAQ</a>
         <a class="pill" href="#contact">Kontakt</a>
       </nav>
@@ -521,35 +522,103 @@
     <section class="section contact" id="contact">
       <div class="container contact-grid">
         <div>
-          <p class="eyebrow">Kontakt</p>
-          <h2>Dein Alltag, automatisiert.</h2>
-          <p class="muted">Sag uns, wobei du Ruhe brauchst. Wir richten die Workflows ein, aktivieren Integrationen und lassen die Automationen im Hintergrund laufen.</p>
+          <p class="eyebrow">Automation starten</p>
+          <h2>Starte jetzt eine echte KI-Aktion.</h2>
+          <p class="muted">Beschreibe dein Anliegen, wähle die Aktion und Atria führt sie aus: Kalendertermin, E-Mail-Versand oder Preisprüfung. Ergebnisse und Status landen live unten in der Liste.</p>
           <div class="contact-meta">
             <div>
-              <p class="label">Email</p>
-              <a href="mailto:hello@atria.dev">hello@atria.dev</a>
+              <p class="label">Integrationen</p>
+              <p>Google Calendar, SMTP Mail, Preis-APIs, Logging</p>
             </div>
             <div>
-              <p class="label">Office</p>
-              <p>Remote-first • EU & US Timezones</p>
+              <p class="label">Status</p>
+              <p>Live-Tasks, Audit-Logs & Fehlermeldungen</p>
             </div>
           </div>
         </div>
-        <form class="contact-form" id="contact-form">
-          <label for="name">Name</label>
-          <input id="name" name="name" type="text" autocomplete="name" required>
+        <form class="contact-form" id="task-form">
+          <label for="task-description">Was soll erledigt werden?</label>
+          <textarea id="task-description" name="description" rows="3" placeholder='z.B. "Meeting morgen 10:00" oder "E-Mail an info@example.com senden"' required></textarea>
 
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" autocomplete="email" required>
+          <label for="task-type">Aktion</label>
+          <select id="task-type" name="type">
+            <option value="calendarCreate">Kalender erstellen</option>
+            <option value="emailSend">E-Mail senden</option>
+            <option value="priceCheck">Preis prüfen</option>
+            <option value="routine">Routine</option>
+          </select>
 
-          <label for="message">Wobei soll Atria dir Zeit schenken?</label>
-          <textarea id="message" name="message" rows="4" placeholder="Beispiele: Termine koordinieren, Preisabfragen, Reiseplanung, Erinnerungen" required></textarea>
+          <div class="field-group" data-for="calendarCreate">
+            <label for="calendar-title">Titel</label>
+            <input id="calendar-title" name="calendarTitle" type="text" placeholder="Projekt-Kickoff">
+            <div class="inline-fields">
+              <div>
+                <label for="calendar-start">Start (ISO)</label>
+                <input id="calendar-start" name="calendarStart" type="datetime-local">
+              </div>
+              <div>
+                <label for="calendar-end">Ende (ISO)</label>
+                <input id="calendar-end" name="calendarEnd" type="datetime-local">
+              </div>
+            </div>
+            <label for="calendar-timezone">Zeitzone</label>
+            <input id="calendar-timezone" name="calendarTimezone" type="text" placeholder="Europe/Berlin">
+          </div>
+
+          <div class="field-group" data-for="emailSend">
+            <label for="email-to">Empfänger</label>
+            <input id="email-to" name="emailTo" type="email" placeholder="person@example.com">
+            <label for="email-subject">Betreff</label>
+            <input id="email-subject" name="emailSubject" type="text" placeholder="Statusupdate">
+            <label for="email-body">Text</label>
+            <textarea id="email-body" name="emailBody" rows="3" placeholder="Nachrichtentext"></textarea>
+          </div>
+
+          <div class="field-group" data-for="priceCheck">
+            <label for="price-query">Produkt oder Stichwort</label>
+            <input id="price-query" name="priceQuery" type="text" placeholder="Noise Cancelling Kopfhörer">
+          </div>
 
           <div class="form-actions">
-            <button class="btn primary" type="submit">Nachricht senden</button>
-            <p class="form-feedback" id="form-feedback" role="status" aria-live="polite"></p>
+            <button class="btn primary" type="submit" id="task-submit">Automation ausführen</button>
+            <p class="form-feedback" id="task-feedback" role="status" aria-live="polite"></p>
           </div>
         </form>
+      </div>
+    </section>
+
+    <section class="section alt" id="tasks">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Live-Status</p>
+          <h2>Zuletzt ausgeführte Tasks</h2>
+          <p class="muted">Alle Tasks werden gespeichert – inklusive Ergebnis oder Fehler. So siehst du, dass echte Automationen laufen.</p>
+        </div>
+        <div class="task-status-grid">
+          <div class="card">
+            <div class="personal-header">
+              <div>
+                <p class="label">Letzte 10 Tasks</p>
+                <h3>Status & Ergebnisse</h3>
+              </div>
+              <span class="chip" id="task-list-state">Aktualisiert</span>
+            </div>
+            <ul class="task-list" id="task-status-list" aria-live="polite"></ul>
+          </div>
+          <div class="card live-card">
+            <div class="personal-header">
+              <div>
+                <p class="label">Antwort</p>
+                <h3>Ergebnis des letzten Auftrags</h3>
+              </div>
+              <span class="chip success" id="result-state">Bereit</span>
+            </div>
+            <div class="task-result" id="task-result" hidden>
+              <p class="muted" id="task-result-text"></p>
+              <div id="price-results" class="price-results" hidden></div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </main>

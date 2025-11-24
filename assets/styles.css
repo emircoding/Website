@@ -167,6 +167,22 @@ svg {
   background: rgba(16, 185, 129, 0.12);
 }
 
+.chip.error {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.chip.info {
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #1d4ed8;
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.chip.pulse {
+  animation: pulse 1s ease-in-out infinite;
+}
+
 .chip-toggle {
   cursor: pointer;
   transition: all 160ms ease;
@@ -702,6 +718,101 @@ svg {
 .form-feedback {
   margin: 0;
   color: var(--accent);
+}
+
+.field-group {
+  display: grid;
+  gap: 10px;
+}
+
+.field-group[hidden] {
+  display: none;
+}
+
+.inline-fields {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.task-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.task-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.task-meta {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  text-align: right;
+}
+
+.task-result {
+  display: grid;
+  gap: 12px;
+}
+
+.price-results ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.price-results li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ghost-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.ghost-link:hover,
+.ghost-link:focus-visible {
+  text-decoration: underline;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3); }
+  70% { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
 }
 
 .site-footer {
