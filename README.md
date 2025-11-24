@@ -1,12 +1,12 @@
-# Atria Automations Landing
+# Atria Automations – Alltagshelfer
 
-Eine moderne, responsive Landing Page für eine KI-Automationsplattform, die wie ein Full-Stack-Entwickler im Hintergrund arbeitet. Die Seite präsentiert eine Next.js/Tailwind-inspirierte Oberfläche mit viel Weißraum, Glass-Effekten und klaren Komponenten.
+Eine moderne, responsive Website für eine KI-Automationsplattform, die wie ein Full-Stack-Entwickler im Hintergrund arbeitet und deinen Alltag ohne Kosten erleichtert. Die Seite präsentiert eine Next.js/Tailwind-inspirierte Oberfläche mit viel Weißraum, Glass-Effekten und klaren Komponenten.
 
 ## Features
-- Hero, Fähigkeiten, Pipeline, Task-Modell, Login & Sicherheit, Erlebnis, Workflows, Pricing, FAQ und Kontakt – alles sofort einsatzbereit.
+- Hero, Fähigkeiten, Pipeline, Task-Modell, Login & Sicherheit, Erlebnis, Workflows, Alltagsroutinen (statt Pricing), FAQ und Kontakt – alles einsatzbereit ohne Verkaufsfokus.
 - Mobile Navigation mit Toggle, Sticky Header, FAQ-Akkordeon und Formular-Feedback.
 - Design-Tokens (Farben, Radien, Schatten) und responsive Grids für konsistentes Layout.
-- Copy fokussiert auf Natural-Language-Input, Task-Modell, Entscheidungs-Engine, Integrationsadapter und OAuth Login.
+- Copy fokussiert auf Natural-Language-Input, Task-Modell, Entscheidungs-Engine, Integrationsadapter, OAuth Login und praktische Routinen für Ruhe im Alltag.
 
 ## Struktur
 - `index.html` – Markup für alle Sektionen und Navigation.
