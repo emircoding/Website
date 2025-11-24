@@ -4,8 +4,10 @@ Eine moderne, responsive Website für eine KI-Automationsplattform, die wie ein 
 
 ## Features
 - Hero, Fähigkeiten, Pipeline, Task-Modell, Login & Sicherheit, Erlebnis, Workflows, Alltagsroutinen (statt Pricing), FAQ und Kontakt – alles einsatzbereit ohne Verkaufsfokus.
-- Mobile Navigation mit Toggle, Sticky Header, FAQ-Akkordeon und Formular-Feedback.
-- Design-Tokens (Farben, Radien, Schatten) und responsive Grids für konsistentes Layout.
+- Neue Sektionen für Personalisierung und Live-Logging, damit Tagesmodi (Ruhiger Start, Fokusphase, Unterwegs, Abendruhe) UI- und Integrationszustände aktiv umschalten.
+- Echtzeit-Integrationsübersicht für Kalender, Mail, WhatsApp, Slack, Notion, Telefonie mit Statuschips im iOS-inspirierten Glasdesign.
+- Mobile Navigation mit Toggle, Sticky Header, FAQ-Akkordeon, Formular-Feedback plus dynamischem Aktivitätsfeed, der Audit-Events im Frontend simuliert.
+- Design-Tokens (Farben, Radien, Schatten) und responsive Grids für konsistentes Layout auf iOS, Windows und im Web.
 - Copy fokussiert auf Natural-Language-Input, Task-Modell, Entscheidungs-Engine, Integrationsadapter, OAuth Login und praktische Routinen für Ruhe im Alltag.
 
 ## Struktur
@@ -16,5 +18,5 @@ Eine moderne, responsive Website für eine KI-Automationsplattform, die wie ein 
 ## Nutzung
 1. `index.html` im Browser öffnen, um die Seite lokal zu sehen.
 2. Texte, Farben und Icons anpassen; dafür die Variablen oben in `assets/styles.css` nutzen.
-3. CTA-Links und Formular-Handler in `assets/main.js` mit deinen Endpunkten oder OAuth-Flows verbinden.
+3. CTA-Links und Formular-Handler in `assets/main.js` mit deinen Endpunkten oder OAuth-Flows verbinden; Activity-Feed und Preset-Logik lassen sich dort um echte Events/States erweitern.
 4. Auf einen statischen Host wie Netlify, Vercel, GitHub Pages oder eigenen Server deployen.

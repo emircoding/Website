@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Atria Automations | KI-Alltagshelfer</title>
-  <meta name="description" content="Atria ist dein KI-Alltagshelfer: Automationen, Integrationen und Workflows laufen im Hintergrund, damit du einen ruhigeren Tag hast – ganz ohne Kosten oder Verkaufsdruck.">
+  <meta name="description" content="Atria ist dein persönlicher KI-Alltagshelfer: Automationen, Integrationen und Workflows laufen im Hintergrund, damit du einen ruhigeren Tag hast – auf iOS, Windows und im Web.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,9 +22,11 @@
       </button>
       <nav class="nav" id="site-nav">
         <a href="#platform">Start</a>
+        <a href="#personal">Personalisiert</a>
         <a href="#capabilities">Fähigkeiten</a>
         <a href="#pipeline">Pipeline</a>
         <a href="#task-model">Task-Modell</a>
+        <a href="#integrations">Integrationen</a>
         <a href="#security">Sicherheit</a>
         <a href="#daily">Alltag</a>
         <a href="#faq">FAQ</a>
@@ -39,8 +41,8 @@
         <div class="hero-grid">
           <div class="hero-copy">
             <p class="eyebrow">KI-Automation für deinen Alltag</p>
-            <h1>Du sagst, was du brauchst – Atria erledigt es im Hintergrund.</h1>
-            <p class="lede">Atria versteht deine Sprache, zerlegt sie in Aufgaben und führt Weblogik, Integrationen und Routinen automatisch aus. Kein Verkauf, keine Paywall – nur ein ruhigerer Tag für dich.</p>
+            <h1>Du sagst, was du brauchst – Atria erledigt es wie eine iOS-App im Hintergrund.</h1>
+            <p class="lede">Atria versteht deine Sprache, baut daraus Tasks, verknüpft Apps in Echtzeit und führt alles für dich aus – egal ob iPhone, iPad oder Windows-PC. Kein Verkauf, nur ein ruhigerer Tag.</p>
             <div class="actions">
               <a class="btn primary" href="#contact">Alltag entspannen</a>
               <a class="btn ghost" href="#capabilities">Fähigkeiten ansehen</a>
@@ -50,6 +52,7 @@
               <span class="pill-badge">OAuth Login & Sessions</span>
               <span class="pill-badge">Typisierte Tasks</span>
               <span class="pill-badge">Audit-Logs & Replays</span>
+              <span class="pill-badge">Realtime Integrationen</span>
             </div>
           </div>
           <div class="hero-card">
@@ -74,6 +77,80 @@
                 <p>Überwachung & Replays</p>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="personal">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Für dich personalisiert</p>
+          <h2>Von Morgenstart bis Abendruhe – Atria passt sich deinem Rhythmus an.</h2>
+          <p class="muted">Wähle deinen Fokus, aktiviere Integrationen und beobachte, wie Tasks live erstellt, ausgeführt und geloggt werden.</p>
+        </div>
+        <div class="personal-grid">
+          <div class="card personal-card">
+            <div class="personal-header">
+              <div>
+                <p class="label">Tagesmodus</p>
+                <h3 id="mode-heading">Ruhiger Start</h3>
+              </div>
+              <span class="chip success">Live</span>
+            </div>
+            <p class="muted">Tippe auf einen Modus, um Prioritäten, Benachrichtigungen und Integrationen zu justieren. Ideal für iOS- oder Windows-Layouts.</p>
+            <div class="chip-row preferences" id="preferences">
+              <button class="chip-toggle active" data-mode="Ruhiger Start">Ruhiger Start</button>
+              <button class="chip-toggle" data-mode="Fokusphase">Fokusphase</button>
+              <button class="chip-toggle" data-mode="Unterwegs">Unterwegs</button>
+              <button class="chip-toggle" data-mode="Abendruhe">Abendruhe</button>
+            </div>
+            <div class="personal-states">
+              <div>
+                <p class="label">Benachrichtigungen</p>
+                <p class="muted" id="pref-notifications">Gebündelt, leise Pushes, E-Mail Digest</p>
+              </div>
+              <div>
+                <p class="label">Integrationen</p>
+                <p class="muted" id="pref-integrations">Kalender, Mail, WhatsApp, Notion</p>
+              </div>
+              <div>
+                <p class="label">Automationen</p>
+                <p class="muted" id="pref-automations">Termine, Erinnerungen, Zusammenfassungen</p>
+              </div>
+            </div>
+          </div>
+          <div class="card live-card">
+            <div class="personal-header">
+              <div>
+                <p class="label">Live-Logging</p>
+                <h3>Was Atria gerade tut</h3>
+              </div>
+              <span class="chip">Audit</span>
+            </div>
+            <ul class="activity-feed" id="activity-feed" aria-live="polite">
+              <li>
+                <div class="activity-meta">
+                  <span class="pill-badge">Kalender</span>
+                  <span class="time">Jetzt</span>
+                </div>
+                <p>Freie Slots für Donnerstag abgeglichen und Alternativen vorgeschlagen.</p>
+              </li>
+              <li>
+                <div class="activity-meta">
+                  <span class="pill-badge">WhatsApp</span>
+                  <span class="time">Gerade</span>
+                </div>
+                <p>Follow-up an Sarah gesendet mit Bestätigung für 19:00.</p>
+              </li>
+              <li>
+                <div class="activity-meta">
+                  <span class="pill-badge">E-Mail</span>
+                  <span class="time">Heute</span>
+                </div>
+                <p>Zusammenfassung der erledigten Tasks verschickt, inklusive Audit-Log Links.</p>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -106,6 +183,66 @@
             <div class="icon">🛡️</div>
             <h3>Security & Sessions</h3>
             <p>OAuth-Login mit Google, Apple oder E-Mail, sichere Tokens, Session-Verwaltung, Berechtigungsprüfungen und Audit-Logs vor jeder kritischen Aktion.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="integrations">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Integrationen in Echtzeit</p>
+          <h2>Verbinde deine Apps, überwache den Status und lasse Atria ausführen.</h2>
+          <p class="muted">Kalender, Mail, WhatsApp, Slack, Notion, Telefonie – Adapter sorgen für einheitliche Interfaces, Logging und sofortige Replays.</p>
+        </div>
+        <div class="integration-grid">
+          <article class="connector">
+            <div>
+              <p class="label">Kalender</p>
+              <h3>Google & Outlook</h3>
+              <p class="muted">Slots lesen, prüfen, schreiben, verschieben – mit Konflikt-Checks.</p>
+            </div>
+            <div class="status success">Live</div>
+          </article>
+          <article class="connector">
+            <div>
+              <p class="label">Nachrichten</p>
+              <h3>WhatsApp & SMS</h3>
+              <p class="muted">Kontextuelle Nachrichten versenden, Bestätigungen einholen, Threads loggen.</p>
+            </div>
+            <div class="status success">Aktiv</div>
+          </article>
+          <article class="connector">
+            <div>
+              <p class="label">E-Mail</p>
+              <h3>IMAP/SMTP</h3>
+              <p class="muted">Briefings, Follow-ups, Anhänge, Signaturen – alles versioniert.</p>
+            </div>
+            <div class="status">Bereit</div>
+          </article>
+          <article class="connector">
+            <div>
+              <p class="label">Wissen & Docs</p>
+              <h3>Notion & Drive</h3>
+              <p class="muted">Research speichern, Roadmaps pflegen, Meeting-Notes archivieren.</p>
+            </div>
+            <div class="status">Sync</div>
+          </article>
+          <article class="connector">
+            <div>
+              <p class="label">Telefonie</p>
+              <h3>Voice APIs</h3>
+              <p class="muted">Anrufe aufbauen, Anliegen klären, Transkripte erzeugen, Ergebnisse loggen.</p>
+            </div>
+            <div class="status warning">Ruft an</div>
+          </article>
+          <article class="connector">
+            <div>
+              <p class="label">Team & Chat</p>
+              <h3>Slack & Teams</h3>
+              <p class="muted">Updates, Alerts und Entscheidungen in deine Kanäle streamen.</p>
+            </div>
+            <div class="status">Standby</div>
           </article>
         </div>
       </div>
