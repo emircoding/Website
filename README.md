@@ -86,7 +86,7 @@ Auf der Startseite gibt es dazu einen animierten Teaser „Unser Bestand – liv
 
 Beide Formulare (Kontakt und Fahrzeugankauf) senden **direkt per E-Mail** – ohne dass beim Kunden ein Mail-Programm aufgeht:
 - **Kontakt:** E-Mail mit allen Angaben.
-- **Fahrzeugankauf:** E-Mail **mit PDF-Anhang** (alle Fahrzeugdaten, Kontakt, Anmerkungen und bis zu 10 Fotos).
+- **Fahrzeugankauf:** E-Mail **mit PDF-Anhang** (alle Fahrzeugdaten, Kontakt, Anmerkungen und bis zu 10 Fotos). Im PDF ist jedes Foto anklickbar und öffnet eine eigene Seite in Großansicht. Zusätzlich hängen die Fotos einzeln als JPG an der E-Mail (zum Antippen, Zoomen, Speichern).
 
 Empfänger ist die E-Mail-Adresse aus `assets/js/config.js`. Antworten gehen per „Antworten“ direkt an den Kunden.
 Fotos werden **nicht** auf dem Webspace gespeichert – sie gehen nur im PDF raus.

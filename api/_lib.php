@@ -91,8 +91,9 @@ function photo_jpeg($tmp) {
   return null;
 }
 
-// E-Mail mit optionalem Anhang über die PHP-Funktion mail() des Hosters senden
-function send_mail($to, $subject, $text, $replyTo = '', $attachment = null) {
+// E-Mail mit optionalen Anhängen über die PHP-Funktion mail() des Hosters senden
+// $attachments = [ ['name' => 'datei.pdf', 'type' => 'application/pdf', 'data' => …], … ]
+function send_mail($to, $subject, $text, $replyTo = '', $attachments = array()) {
   $from = mail_from();
   $enc = function ($s) { return '=?UTF-8?B?' . base64_encode($s) . '?='; };
   $headers = array();
@@ -100,14 +101,15 @@ function send_mail($to, $subject, $text, $replyTo = '', $attachment = null) {
   if ($replyTo && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) $headers[] = 'Reply-To: ' . $replyTo;
   $headers[] = 'MIME-Version: 1.0';
   $headers[] = 'X-Mailer: Automobilzentrum-Website';
-  if ($attachment) {
+  if ($attachments) {
     $b = 'azn_' . bin2hex(random_bytes(12));
     $headers[] = 'Content-Type: multipart/mixed; boundary="' . $b . '"';
-    $body = "--$b\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n"
-      . chunk_split(base64_encode($text))
-      . "--$b\r\nContent-Type: application/pdf; name=\"" . $attachment['name'] . "\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"" . $attachment['name'] . "\"\r\n\r\n"
-      . chunk_split(base64_encode($attachment['data']))
-      . "--$b--\r\n";
+    $body = "--$b\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($text));
+    foreach ($attachments as $a) {
+      $body .= "--$b\r\nContent-Type: " . $a['type'] . "; name=\"" . $a['name'] . "\"\r\nContent-Transfer-Encoding: base64\r\n"
+        . "Content-Disposition: attachment; filename=\"" . $a['name'] . "\"\r\n\r\n" . chunk_split(base64_encode($a['data']));
+    }
+    $body .= "--$b--\r\n";
   } else {
     $headers[] = 'Content-Type: text/plain; charset=UTF-8';
     $headers[] = 'Content-Transfer-Encoding: base64';

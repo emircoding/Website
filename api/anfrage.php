@@ -120,18 +120,42 @@ if ($message !== '') {
   $pdf->color(40, 40, 44);
   $y = $pdf->para($L, $y, $message, $CW, 11, 15) + 18;
 }
-// Fotos (2 Spalten)
+// Fotos: Übersicht (2 Spalten, anklickbar) + je Foto eine Seite in Großansicht
 if ($photos) {
+  $nP = count($photos);
   $gap = 12; $pw = ($CW - $gap) / 2; $ph = $pw * 0.75;
   $bottom = AznPdf::H - 60;
-  if ($y + 30 + $ph > $bottom) { $pdf->addPage(); $y = 60; }
-  $y = $section('FOTOS (' . count($photos) . ')', $y);
+  if ($y + 52 + $ph > $bottom) { $pdf->addPage(); $y = 60; }
+  $y = $section('FOTOS (' . $nP . ')', $y);
+  $pdf->color(109, 109, 114);
+  $pdf->text($L, $y - 8, 'Zum Vergrößern auf ein Foto tippen. Die Fotos liegen der E-Mail außerdem einzeln als JPG bei.', 8.5);
+  $y += 8;
+  $overview = $pdf->current();
+  $thumbs = array();
   foreach ($photos as $k => $img) {
     $col = $k % 2;
     if ($col === 0 && $y + $ph > $bottom) { $pdf->addPage(); $y = 60; }
-    $pdf->color(236, 235, 232); $pdf->rect($colX[0] + $col * ($pw + $gap), $y, $pw, $ph);
-    $pdf->image($img, $L + $col * ($pw + $gap), $y, $pw, $ph);
-    if ($col === 1 || $k === count($photos) - 1) $y += $ph + $gap;
+    $bx = $L + $col * ($pw + $gap);
+    $pdf->color(236, 235, 232); $pdf->rect($bx, $y, $pw, $ph);
+    $pdf->image($img, $bx, $y, $pw, $ph, 'foto' . $k);
+    $pdf->color(11, 11, 12); $pdf->rect($bx, $y + $ph - 20, 26, 20);
+    $pdf->color(255, 255, 255); $pdf->text($bx + 8, $y + $ph - 6, (string) ($k + 1), 9, true);
+    $thumbs[$k] = array($pdf->current(), $bx, $y, $pw, $ph);
+    if ($col === 1 || $k === $nP - 1) $y += $ph + $gap;
+  }
+  // Großansicht: ein Foto pro Seite
+  foreach ($photos as $k => $img) {
+    $pdf->addPage();
+    $page = $pdf->current();
+    $pdf->color(11, 11, 12); $pdf->text($L, 50, 'Foto ' . ($k + 1) . ' von ' . $nP, 14, true);
+    $pdf->color(109, 109, 114); $pdf->text($L, 66, $v['make'] . ' ' . $v['model'] . ' · ' . $name, 9.5);
+    $back = '< Zurück zur Übersicht';
+    $bw = AznPdf::width($back, 9.5, true);
+    $pdf->color(11, 11, 12); $pdf->text($R - $bw, 50, $back, 9.5, true);
+    $pdf->link($page, $R - $bw - 4, 36, $bw + 8, 20, $overview);
+    $pdf->color(236, 235, 232); $pdf->rect($L, 84, $CW, AznPdf::H - 84 - 60);
+    $pdf->image($img, $L, 84, $CW, AznPdf::H - 84 - 60, 'foto' . $k);
+    $pdf->link($thumbs[$k][0], $thumbs[$k][1], $thumbs[$k][2], $thumbs[$k][3], $thumbs[$k][4], $page);
   }
 }
 // Fußzeile auf jeder Seite
@@ -152,9 +176,14 @@ $text = "Neue Fahrzeugankauf-Anfrage über die Website ($stamp)\n\n";
 foreach ($fields as $f) $text .= $f[1] . ': ' . ($v[$f[0]] !== '' ? $v[$f[0]] : '–') . "\n";
 $text .= "\nName: $name\nTelefon: $phone\nE-Mail: " . ($email ?: '–') . "\n";
 if ($message !== '') $text .= "\nAnmerkungen:\n$message\n";
-$text .= "\nFotos: " . count($photos) . "\nAlle Angaben und Fotos stehen im angehängten PDF ($file).\n";
+$text .= "\nFotos: " . count($photos) . "\nAlle Angaben und Fotos stehen im angehängten PDF ($file)."
+  . (count($photos) ? " Die Fotos liegen zusätzlich einzeln als JPG bei – zum Vergrößern einfach antippen." : '') . "\n";
 
-$ok = send_mail($to, 'Fahrzeugankauf: ' . $v['make'] . ' ' . $v['model'] . ' – ' . $name, $text, $email, array('name' => $file, 'data' => $data));
+$attachments = array(array('name' => $file, 'type' => 'application/pdf', 'data' => $data));
+foreach ($photos as $k => $img) {
+  $attachments[] = array('name' => sprintf('Foto-%02d.jpg', $k + 1), 'type' => 'image/jpeg', 'data' => $img['data']);
+}
+$ok = send_mail($to, 'Fahrzeugankauf: ' . $v['make'] . ' ' . $v['model'] . ' – ' . $name, $text, $email, $attachments);
 json_out($ok ? array('ok' => true, 'photos' => count($photos)) : array('error' => 'mail_failed'), $ok ? 200 : 500);
 
 function strtoupper_de($s) { return function_exists('mb_strtoupper') ? mb_strtoupper($s, 'UTF-8') : strtoupper($s); }
