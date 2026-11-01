@@ -8,19 +8,35 @@
   var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var root = document.documentElement;
 
-  /* ---------- Beim Neuladen immer ganz oben starten ---------- */
+  /* ---------- Beim Neuladen immer ganz oben starten (auch iPhone/Safari) ---------- */
   try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch (e) { /* ok */ }
   var nav = window.performance && performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
   var isReload = nav ? nav.type === "reload" : (window.performance && performance.navigation && performance.navigation.type === 1);
   function toTop() {
-    try { window.scrollTo({ top: 0, left: 0, behavior: "instant" }); } catch (e) { window.scrollTo(0, 0); }
+    var de = document.documentElement, prev = de.style.scrollBehavior;
+    de.style.scrollBehavior = "auto"; // kein weiches Scrollen, sofort nach oben
+    window.scrollTo(0, 0);
+    de.scrollTop = 0; if (document.body) document.body.scrollTop = 0;
+    de.style.scrollBehavior = prev;
   }
+  // Safari (iOS) merkt sich die Position beim Verlassen/Neuladen – vorher nach oben setzen,
+  // damit beim nächsten Laden die gespeicherte Position „oben“ ist.
+  window.addEventListener("pagehide", toTop);
   if (isReload) {
     // Sprungmarke (z. B. #kontakt) beim Neuladen entfernen, damit es oben losgeht
     if (location.hash) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) { /* ok */ } }
+    var userScrolled = false;
+    var stop = function () { userScrolled = true; };
+    ["touchstart", "wheel", "keydown", "mousedown"].forEach(function (ev) { window.addEventListener(ev, stop, { once: true, passive: true }); });
+    var again = function () { if (!userScrolled) toTop(); };
     toTop();
-    document.addEventListener("DOMContentLoaded", toTop);
-    window.addEventListener("load", function () { toTop(); setTimeout(toTop, 0); });
+    document.addEventListener("DOMContentLoaded", again);
+    window.addEventListener("load", function () {
+      // Safari stellt die alte Position teils verzögert wieder her → mehrfach nachziehen
+      [0, 50, 120, 250, 500, 900].forEach(function (t) { setTimeout(again, t); });
+      requestAnimationFrame(function () { requestAnimationFrame(again); });
+    });
+    window.addEventListener("pageshow", again);
   }
 
   /* ---------- Firmendaten aus config.js einsetzen ---------- */
