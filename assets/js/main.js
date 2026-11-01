@@ -508,8 +508,26 @@
   function reviews() {
     var sec = document.querySelector("[data-reviews]");
     var G = C.google || {};
-    if (!sec || !(G.rating > 0)) return;
+    if (!sec) return;
     sec.hidden = false;
+    if (!(G.rating > 0)) {
+      // Noch keine Google-Daten eingetragen: Aufruf zum Bewerten statt Sternen/Zahlen
+      sec.classList.add("reviews--cta");
+      var h = sec.querySelector(".section__title");
+      if (h) h.innerHTML = "Zufrieden mit uns?<br><em>Sagen Sie es weiter.</em>";
+      sec.querySelector(".rating").innerHTML =
+        '<div class="stars stars--lg stars--outline" aria-hidden="true">' + starsHTML(5) + "</div>" +
+        '<p class="rating__count">Wir freuen uns über Ihre Bewertung auf Google – das dauert nur eine Minute und hilft uns sehr.</p>' +
+        '<div class="rating__links"><a class="btn" data-href="greview" href="#" target="_blank" rel="noopener">Jetzt bewerten</a>' +
+        '<a class="link-arrow" data-href="gprofile" href="#" target="_blank" rel="noopener">Bewertungen auf Google ansehen</a></div>';
+      var t = sec.querySelector("[data-reviews-track]"); if (t) t.remove();
+      var n = sec.querySelector(".reviews__note"); if (n) n.remove();
+      // Links neu setzen (wurden vor dem Einfügen vergeben)
+      var gp = (C.google && C.google.profileUrl) || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.name + ", " + C.street + ", " + C.zip + " " + C.city);
+      sec.querySelectorAll("[data-href=gprofile]").forEach(function (a) { a.href = gp; });
+      sec.querySelectorAll("[data-href=greview]").forEach(function (a) { a.href = (C.google && C.google.reviewUrl) || gp; });
+      return;
+    }
     var nf = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     sec.querySelector("[data-rating-value]").textContent = nf.format(G.rating);
     sec.querySelector("[data-rating-stars]").innerHTML = starsHTML(G.rating);

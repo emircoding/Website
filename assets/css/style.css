@@ -982,6 +982,12 @@ ul { margin: 0; padding: 0; list-style: none; }
 .stars .star:nth-child(4) { animation-delay: .24s; }
 .stars .star:nth-child(5) { animation-delay: .32s; }
 @keyframes starPop { 0% { transform: scale(0) rotate(-40deg); opacity: 0; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: none; } }
+.reviews--cta .section__head { align-items: center; margin-bottom: 0; }
+.reviews--cta .rating { max-width: 420px; gap: 14px; }
+.reviews--cta .rating__links { align-items: center; gap: 22px; }
+.stars--outline .star { background: #d3d2ce; transition: background .25s; }
+.stars--outline:hover .star { background: #f2a900; }
+.stars--outline .star:hover ~ .star { background: #d3d2ce; }
 .reviews__track {
   display: grid; grid-auto-flow: column; grid-auto-columns: minmax(300px, 1fr);
   gap: clamp(14px, 1.6vw, 24px); overflow-x: auto; scroll-snap-type: x mandatory;
