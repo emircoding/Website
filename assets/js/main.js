@@ -211,6 +211,128 @@
     }
   }
 
+  /* ---------- Hero: Auto startet beim Scrollen, Burnout mit Reifenqualm, fährt weg ---------- */
+  function heroDrive() {
+    var pin = document.querySelector("[data-hero-pin]");
+    if (!pin || reduce) return;
+    var hero = pin.querySelector(".hero"), svg = hero.querySelector(".hero__car"), drive = hero.querySelector(".hero__car-drive");
+    var canvas = hero.querySelector(".hero__smoke");
+    if (!svg || !drive || !canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext("2d"), wheels = svg.querySelectorAll(".wheel");
+    var W = 0, H = 0, dpr = 1, carW = 1;
+    function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+    function size() {
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = hero.clientWidth; H = hero.clientHeight;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    size();
+    window.addEventListener("resize", size);
+
+    // weiche Rauch-Sprites (einmal vorberechnet → schnell auf dem iPhone)
+    function sprite(rgb) {
+      var c = document.createElement("canvas"); c.width = c.height = 96;
+      var g = c.getContext("2d"), gr = g.createRadialGradient(48, 48, 0, 48, 48, 48);
+      gr.addColorStop(0, "rgba(" + rgb + ",1)"); gr.addColorStop(.45, "rgba(" + rgb + ",.5)"); gr.addColorStop(1, "rgba(" + rgb + ",0)");
+      g.fillStyle = gr; g.fillRect(0, 0, 96, 96); return c;
+    }
+    var SP = { exhaust: sprite("72,72,78"), tire: sprite("150,150,156"), tire2: sprite("205,205,208") };
+
+    var parts = [], live = false, target = 0, cur = 0, lights = 0, lightsOn = false, flick = 0;
+    var rearA = 0, frontA = 0, lastX = 0, lastT = 0, accEx = 0, accTire = 0, accLine = 0, visible = true;
+    function goLive() { if (live) return; live = true; hero.classList.add("is-live"); }
+    svg.addEventListener("animationend", function (e) { if (e.animationName === "driveIn") goLive(); });
+    setTimeout(goLive, 3200);
+
+    function read() {
+      var r = pin.getBoundingClientRect(), total = pin.offsetHeight - innerHeight;
+      target = total > 0 ? clamp(-r.top / total) : 0;
+      visible = r.bottom > 0 && r.top < innerHeight;
+    }
+    function emit(kind, x, y, k) {
+      var p;
+      if (kind === "exhaust") p = { sp: SP.exhaust, x: x, y: y, vx: -(30 + Math.random() * 60) * k, vy: -(6 + Math.random() * 18) * k, r: 3 * k, g: (18 + Math.random() * 14) * k, max: 1.3 + Math.random() * .9, a: .32 };
+      else if (kind === "tire") p = { sp: Math.random() < .55 ? SP.tire : SP.tire2, x: x + (Math.random() - .5) * 30 * k, y: y - Math.random() * 10 * k, vx: -(40 + Math.random() * 260) * k, vy: -(14 + Math.random() * 70) * k, r: (10 + Math.random() * 12) * k, g: (45 + Math.random() * 60) * k, max: 1.8 + Math.random() * 1.6, a: .55 };
+      else p = { line: true, x: x, y: y, len: (80 + Math.random() * 260) * k, max: .35 + Math.random() * .25, a: .5 };
+      p.life = 0; parts.push(p);
+      if (parts.length > 420) parts.shift();
+    }
+    function frame(t) {
+      requestAnimationFrame(frame);
+      var dt = lastT ? Math.min(.05, (t - lastT) / 1000) : .016; lastT = t;
+      read();
+      if (!visible && !parts.length) return;
+      cur += (target - cur) * Math.min(1, dt * 7);
+      var s = cur;
+
+      // Phasen: Zündung → Licht an → Burnout → Abfahrt
+      var on = live && s > .015;
+      if (on !== lightsOn) { lightsOn = on; flick = 0; }
+      flick += dt;
+      var lt = lightsOn ? (flick < .07 ? 1 : flick < .14 ? .15 : flick < .24 ? 1 : flick < .3 ? .4 : 1) : 0;
+      lights += (lt - lights) * Math.min(1, dt * 28);
+      var burn = live ? clamp((s - .08) / .12) * (1 - clamp((s - .6) / .14)) : 0;
+      var g = live ? clamp((s - .46) / .44) : 0, go = g * g * g;
+      var x = go * (W * 1.25 + 260);
+      var jit = burn > .05 ? (Math.random() - .5) * 1.6 * burn : 0;
+      var tilt = -(burn * 1.1 + Math.min(1, g * 5) * .7 * (1 - g));
+      drive.style.transform = "translate3d(" + x.toFixed(1) + "px," + jit.toFixed(2) + "px,0) rotate(" + tilt.toFixed(3) + "deg)";
+
+      var rect = svg.getBoundingClientRect(), hr = hero.getBoundingClientRect();
+      carW = rect.width || carW;
+      var k = carW / 900; // Maßstab: SVG-Einheit → Pixel
+      var wheelR = 50 * k, dx = x - lastX, vx = dx / Math.max(dt, .001); lastX = x;
+      var roll = dx / wheelR * 57.2958;
+      if (live) {
+        rearA += roll + burn * 1700 * dt;
+        frontA += roll;
+        if (wheels[0]) wheels[0].style.transform = "rotate(" + rearA.toFixed(1) + "deg)";
+        if (wheels[1]) wheels[1].style.transform = "rotate(" + frontA.toFixed(1) + "deg)";
+      }
+      svg.style.setProperty("--lights", lights.toFixed(3));
+      svg.style.setProperty("--tail", Math.min(1, lights * .55 + burn * .45 + Math.min(1, g * 4) * .2).toFixed(3));
+      hero.style.setProperty("--hint", (1 - clamp(s / .04)).toFixed(3));
+
+      // Partikel erzeugen (Koordinaten relativ zum Hero)
+      var ox = rect.left - hr.left, oy = rect.top - hr.top, sy = rect.height / 290;
+      if (lightsOn && visible) {
+        accEx += (5 + burn * 26 + Math.min(1, g * 3) * 14 * (1 - g)) * dt;
+        while (accEx >= 1) { accEx--; emit("exhaust", ox + 60 * k, oy + 203 * sy, k); }
+        accTire += (burn * 75 + (g > 0 && g < .55 ? 55 * (1 - g / .55) : 0)) * dt;
+        while (accTire >= 1) { accTire--; emit("tire", ox + 190 * k, oy + 258 * sy, k); }
+        if (vx > 900) {
+          accLine += Math.min(40, vx / 60) * dt;
+          while (accLine >= 1) { accLine--; emit("line", ox - Math.random() * 120 * k, oy + (60 + Math.random() * 190) * sy, k); }
+        }
+      }
+
+      // Partikel bewegen & zeichnen
+      ctx.clearRect(0, 0, W, H);
+      for (var i = parts.length - 1; i >= 0; i--) {
+        var p = parts[i];
+        p.life += dt;
+        var lf = p.life / p.max;
+        if (lf >= 1) { parts.splice(i, 1); continue; }
+        if (p.line) {
+          ctx.globalAlpha = p.a * (1 - lf);
+          ctx.fillStyle = "#0b0b0c";
+          ctx.fillRect(p.x - p.len * (1 - lf * .5), p.y, p.len * (1 - lf * .5), 1);
+          continue;
+        }
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        p.vx *= 1 - 1.4 * dt; p.vy -= 10 * k * dt;
+        p.r += p.g * dt;
+        var a = p.a * Math.min(1, p.life / .12) * Math.pow(1 - lf, 1.6);
+        if (a < .004) continue;
+        ctx.globalAlpha = a;
+        ctx.drawImage(p.sp, p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+      }
+      ctx.globalAlpha = 1;
+    }
+    requestAnimationFrame(frame);
+  }
+
   /* ---------- Speedlines im Hero ---------- */
   function speedlines() {
     var box = document.querySelector(".speedlines");
@@ -267,6 +389,7 @@
     preloader(function () {
       root.classList.add("is-ready");
       observe(document);
+      heroDrive();
     });
   });
 

@@ -30,6 +30,10 @@ window.AZN_CONFIG = {
   // Link zur Händlerseite auf mobile.de (Button „Gesamter Bestand auf mobile.de“)
   mobileDeUrl: "https://www.mobile.de/",
 
+  // Optional: offizielles mobile.de-Logo als Datei (z. B. "assets/img/mobile-de.svg").
+  // Leer lassen = Schriftzug „mobile.de“ als Platzhalter bei Fahrzeugen ohne Fotos.
+  mobileDeLogo: "",
+
   // Live-Bestand: wird automatisch von mobile.de geladen, sobald in Cloudflare
   // die Zugangsdaten hinterlegt sind (siehe README.md). Bis dahin: Demo-Fahrzeuge.
   inventoryApi: "/api/fahrzeuge"

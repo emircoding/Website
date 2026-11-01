@@ -61,7 +61,9 @@ Einmal dort ändern → alle Seiten, Footer, Impressum, Buttons übernehmen es a
 
 ## 4. mobile.de verbinden (Live-Bestand)
 
-Die Website ist fertig vorbereitet: Die Datei `functions/api/fahrzeuge.js` holt den Bestand über die **mobile.de Search-API**, wandelt ihn um und speichert ihn 10 Minuten zwischen. Neue Inserate auf mobile.de erscheinen dadurch automatisch auf der Website – mit Fotos, Preis, Ausstattung und Link zum Inserat.
+Die Website ist fertig vorbereitet: Die Datei `functions/api/fahrzeuge.js` holt den Bestand über die **mobile.de Search-API** und aktualisiert ihn alle 5 Minuten. Alles kommt direkt von mobile.de: **Fotos, Preis, Daten, Ausstattung, Beschreibung und der Link zum Inserat**. Neue Inserate erscheinen automatisch, verkaufte verschwinden automatisch – auf der Website muss nie etwas von Hand gepflegt werden.
+
+Hat ein Fahrzeug (noch) keine Fotos, wird ein **mobile.de-Platzhalter** angezeigt. Wer statt des Schriftzugs das offizielle mobile.de-Logo möchte: Logo-Datei (z. B. aus dem mobile.de-Händlerbereich) als `assets/img/mobile-de.svg` ablegen und in `config.js` bei `mobileDeLogo` eintragen.
 
 1. Bei mobile.de (Händlerbereich bzw. Händler-Support) **API-Zugang für die Search-API** anfordern. Man erhält Benutzername + Passwort; die **Kundennummer** steht im Händlerbereich.
 2. Cloudflare → Projekt → **Settings** → **Variables and Secrets** → für *Production* hinzufügen:
@@ -79,7 +81,8 @@ Solange keine Zugangsdaten hinterlegt sind (oder mobile.de nicht erreichbar ist)
 
 ## Technik & Features
 
-- Intro-Animation (Logo-Swoosh zeichnet sich), Auto fährt in den Hero ein (Räder drehen, Scheinwerfer blinken auf, Lack-Reflex)
+- Intro-Animation (Logo-Swoosh zeichnet sich), Auto fährt in den Hero ein (Räder drehen, Lack-Reflex)
+- **Scroll-Fahrt:** Beim Scrollen startet der Motor – Licht flackert an, Auspuff raucht, Hinterräder drehen durch mit Reifenqualm (Burnout), dann zieht das Auto aus dem Bild. Zurückscrollen spult alles rückwärts. Rauch als Partikel-Animation (flüssig auch auf dem iPhone)
 - Wort-für-Wort-Einblendungen, Scroll-Text-Effekt, Zähler, Parallax, Laufband, magnetische Buttons, 3D-Kipp-Effekt der Fahrzeugkarten
 - Logo mit animiertem Chrom-Glanz
 - Fahrzeugsuche mit Filtern (Marke, Preis, Kraftstoff, Getriebe), Sortierung, Merkliste, Detail-Ansicht mit Bildergalerie (Wischen auf dem iPhone)

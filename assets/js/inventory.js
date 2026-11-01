@@ -35,51 +35,20 @@
     ext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
   };
 
-  /* ---------- Fahrzeug-Silhouette (Platzhalter, solange keine Fotos da sind) ---------- */
-  var SHAPES = {
-    sedan: {
-      body: "M60 214 C 52 200, 50 178, 56 164 C 60 152, 72 146, 96 142 C 150 134, 200 120, 250 98 C 300 76, 360 64, 420 62 C 480 60, 530 72, 580 98 C 610 112, 640 120, 690 126 C 760 134, 820 142, 846 156 C 858 164, 860 182, 852 200 L 846 214 L 758 214 A 58 58 0 0 0 642 214 L 273 214 A 58 58 0 0 0 157 214 Z",
-      glass: "M250 112 C 300 88, 360 76, 422 75 C 474 74, 520 88, 562 108 C 520 113, 400 116, 268 117 Z",
-      pillars: [[444, 75, 117]], wheels: [215, 700], lamp: "M796 146 C 818 148, 836 154, 848 163 C 832 164, 812 160, 796 150 Z", line: "M110 156 C 300 146, 560 142, 830 158"
-    },
-    suv: {
-      body: "M112 214 C 104 196, 104 160, 110 140 C 114 126, 124 118, 146 114 L 196 108 C 226 80, 262 52, 312 46 L 540 44 C 580 46, 606 70, 632 98 C 690 104, 750 110, 784 122 C 800 130, 806 160, 800 200 L 794 214 L 726 214 A 58 58 0 0 0 610 214 L 308 214 A 58 58 0 0 0 192 214 Z",
-      glass: "M214 106 C 240 82, 270 58, 316 54 L 532 52 C 566 56, 592 80, 612 102 Z",
-      pillars: [[430, 53, 104]], wheels: [250, 668], lamp: "M760 116 C 780 118, 796 124, 802 132 C 786 134, 768 130, 760 122 Z", line: "M140 146 C 300 140, 560 136, 796 146"
-    },
-    hatch: {
-      body: "M70 214 C 60 196, 58 160, 64 136 C 68 118, 84 100, 120 92 C 160 70, 220 56, 300 54 L 470 54 C 520 56, 560 80, 600 104 C 680 112, 770 120, 820 136 C 840 144, 846 170, 840 200 L 834 214 L 754 214 A 58 58 0 0 0 638 214 L 273 214 A 58 58 0 0 0 157 214 Z",
-      glass: "M136 100 C 178 78, 228 64, 300 62 L 468 62 C 510 64, 546 84, 578 104 Z",
-      pillars: [[372, 63, 103]], wheels: [215, 696], lamp: "M790 128 C 810 130, 830 136, 838 144 C 820 146, 800 140, 790 134 Z", line: "M90 150 C 300 142, 560 138, 830 150"
-    }
-  };
-  var uidN = 0;
-  function shapeFor(body) {
-    body = (body || "").toLowerCase();
-    if (/suv|gelände|pick/.test(body)) return SHAPES.suv;
-    if (/kombi|klein|kompakt|van|hatch|estate/.test(body)) return SHAPES.hatch;
-    return SHAPES.sedan;
+  /* ---------- Platzhalter, wenn ein Fahrzeug (noch) keine Fotos hat ---------- */
+  function mdeLogo() {
+    return C.mobileDeLogo
+      ? '<img class="mde__img" src="' + esc(C.mobileDeLogo) + '" alt="mobile.de">'
+      : '<span class="mde__logo">mobile<b>.de</b></span>';
   }
-  function carSVG(v, cls) {
-    var s = shapeFor(v.body), u = "c" + (++uidN), col = v.colorHex || "#2a2a2e";
-    var wheels = s.wheels.map(function (x) {
-      return '<g><circle cx="' + x + '" cy="214" r="50" fill="#0b0b0c"/><circle cx="' + x + '" cy="214" r="35" fill="url(#' + u + 'r)"/>' +
-        '<g stroke="#2b2b2f" stroke-width="7" stroke-linecap="round"><path d="M' + x + ' 214V183M' + x + ' 214l29-10M' + x + ' 214l18 25M' + x + ' 214l-18 25M' + x + ' 214l-29-10"/></g>' +
-        '<circle cx="' + x + '" cy="214" r="7" fill="#1a1a1c"/></g>';
-    }).join("");
-    var arches = s.wheels.map(function (x) { return '<path fill="#09090a" d="M' + (x - 58) + ' 214 A 58 58 0 0 1 ' + (x + 58) + ' 214 Z"/>'; }).join("");
-    var pillars = s.pillars.map(function (p) { return '<path stroke="' + col + '" stroke-width="9" d="M' + p[0] + " " + p[1] + " L " + (p[0] - 3) + " " + p[2] + '"/>'; }).join("");
-    return '<svg class="' + (cls || "ph") + '" viewBox="0 0 900 290" aria-hidden="true">' +
-      '<defs><linearGradient id="' + u + 'b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".42" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>' +
-      '<linearGradient id="' + u + 'g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8c939d"/><stop offset=".5" stop-color="#2a2e35"/><stop offset="1" stop-color="#0d0e10"/></linearGradient>' +
-      '<radialGradient id="' + u + 'r"><stop offset="0" stop-color="#ededed"/><stop offset=".7" stop-color="#a1a1a6"/><stop offset="1" stop-color="#55555a"/></radialGradient>' +
-      '<radialGradient id="' + u + 's"><stop offset="0" stop-color="#000" stop-opacity=".4"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>' +
-      '<ellipse cx="455" cy="262" rx="430" ry="15" fill="url(#' + u + 's)"/>' +
-      '<path fill="' + col + '" d="' + s.body + '"/><path fill="url(#' + u + 'b)" d="' + s.body + '"/>' + arches +
-      '<path fill="url(#' + u + 'g)" d="' + s.glass + '"/>' + pillars +
-      '<path fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2" d="' + s.line + '"/>' +
-      '<path fill="#f4f4f4" d="' + s.lamp + '"/>' + wheels + "</svg>";
+  function placeholder() {
+    return '<div class="mde" aria-hidden="true">' + mdeLogo() + '<span class="mde__txt">Fotos auf mobile.de</span></div>';
   }
+  function photo(src, alt, lazy) {
+    // Bild liegt über dem Platzhalter; lädt es nicht, bleibt der mobile.de-Platzhalter sichtbar
+    return '<img src="' + esc(src) + '" alt="' + esc(alt) + '"' + (lazy ? ' loading="lazy"' : "") + ' decoding="async" onerror="this.style.display=\'none\'">';
+  }
+  function adUrl(v) { return v.url || C.mobileDeUrl || ""; }
 
   /* ---------- Laden ---------- */
   var cache = null;
@@ -117,9 +86,7 @@
 
   /* ---------- Karte ---------- */
   function card(v, i) {
-    var media = v.images && v.images.length
-      ? '<img src="' + esc(v.images[0]) + '" alt="' + esc(title(v)) + '" loading="lazy" decoding="async">'
-      : carSVG(v);
+    var media = placeholder() + (v.images && v.images.length ? photo(v.images[0], title(v), true) : "");
     var badge = v.badge || (v.highlight ? "Highlight" : "");
     return '<article class="vcard" data-reveal style="--d:' + ((i % 4) * 0.08) + 's" data-id="' + esc(v.id) + '" tabindex="0" role="button" aria-label="' + esc(title(v)) + ' – Details ansehen">' +
       '<div class="vcard__media">' + (badge ? '<span class="vcard__badge">' + esc(badge) + "</span>" : "") +
@@ -155,7 +122,7 @@
     renderGal();
   }
   function renderGal() {
-    var main = modal.querySelector(".gallery__main img");
+    var main = modal.querySelector(".gallery__main > img");
     if (main) main.src = gal.imgs[gal.i];
     modal.querySelectorAll(".gallery__thumbs button").forEach(function (b, i) { b.classList.toggle("is-active", i === gal.i); });
   }
@@ -166,10 +133,10 @@
     var name = title(v);
     var msg = "Hallo, ich interessiere mich für den " + name + (v.variant ? " " + v.variant : "") + " (" + price(v.price) + ", EZ " + (v.firstReg || "–") + ", " + km(v.mileage) + "). Ist das Fahrzeug noch verfügbar?";
     var gallery = gal.imgs.length
-      ? '<div class="gallery__main"><img src="' + esc(gal.imgs[0]) + '" alt="' + esc(name) + '">' +
+      ? '<div class="gallery__main">' + placeholder() + photo(gal.imgs[0], name, false) +
         (gal.imgs.length > 1 ? '<button class="gallery__nav gallery__nav--prev" data-step="-1" aria-label="Vorheriges Bild">' + ICON.left + '</button><button class="gallery__nav gallery__nav--next" data-step="1" aria-label="Nächstes Bild">' + ICON.right + "</button>" : "") +
         "</div>" + (gal.imgs.length > 1 ? '<div class="gallery__thumbs">' + gal.imgs.map(function (src, i) { return '<button data-thumb="' + i + '"' + (i === 0 ? ' class="is-active"' : "") + '><img src="' + esc(src) + '" alt="" loading="lazy"></button>'; }).join("") + "</div>" : "")
-      : '<div class="gallery__main">' + carSVG(v) + "</div>";
+      : '<a class="gallery__main" href="' + esc(adUrl(v)) + '" target="_blank" rel="noopener" aria-label="Fotos auf mobile.de ansehen">' + placeholder() + "</a>";
     var specs = [
       ["Erstzulassung", v.firstReg || "–"], ["Kilometer", km(v.mileage)],
       ["Leistung", v.powerKw ? v.powerKw + " kW (" + ps(v.powerKw) + ")" : "–"], ["Kraftstoff", v.fuel || "–"],
@@ -184,10 +151,10 @@
       (v.features && v.features.length ? '<div class="tags">' + v.features.slice(0, 18).map(function (f) { return "<span>" + esc(f) + "</span>"; }).join("") + "</div>" : "") +
       (v.description ? '<p class="detail__desc">' + esc(v.description).slice(0, 1200) + "</p>" : "") +
       '<div class="detail__actions">' +
+      (adUrl(v) ? '<a class="btn btn--mde" href="' + esc(adUrl(v)) + '" target="_blank" rel="noopener">' + (v.url ? "Inserat auf mobile.de ansehen " : "Unser Bestand auf mobile.de ") + ICON.ext + "</a>" : "") +
       '<a class="btn" href="https://wa.me/' + esc(C.whatsapp) + "?text=" + encodeURIComponent(msg) + '" target="_blank" rel="noopener">' + ICON.chat + " Per WhatsApp anfragen</a>" +
       '<a class="btn btn--ghost" href="tel:' + esc(C.phone) + '">' + ICON.phone + " " + esc(C.phoneDisplay) + "</a>" +
       '<a class="btn btn--ghost" href="mailto:' + esc(C.email) + "?subject=" + encodeURIComponent("Anfrage: " + name) + "&body=" + encodeURIComponent(msg) + '">' + ICON.mail + " E-Mail-Anfrage</a>" +
-      (v.url ? '<a class="link-arrow" style="justify-self:center;margin-top:8px" href="' + esc(v.url) + '" target="_blank" rel="noopener">Inserat auf mobile.de ' + ICON.ext + "</a>" : "") +
       "</div></div>";
     modal.querySelectorAll("[data-step]").forEach(function (b) { b.addEventListener("click", function () { step(+b.dataset.step); }); });
     modal.querySelectorAll("[data-thumb]").forEach(function (b) { b.addEventListener("click", function () { gal.i = +b.dataset.thumb; renderGal(); }); });
@@ -345,5 +312,5 @@
     if (list) initList(list);
   });
 
-  window.AZN_INV = { load: load, carSVG: carSVG };
+  window.AZN_INV = { load: load };
 })();

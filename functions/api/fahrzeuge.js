@@ -13,7 +13,7 @@
    ========================================================================== */
 
 const API = "https://services.mobile.de/search-api/search";
-const CACHE_SECONDS = 600; // Bestand max. alle 10 Minuten neu von mobile.de holen
+const CACHE_SECONDS = 300; // Bestand alle 5 Minuten frisch von mobile.de holen
 
 const FUEL = {
   PETROL: "Benzin", DIESEL: "Diesel", ELECTRICITY: "Elektro", HYBRID: "Hybrid (Benzin/Elektro)",
