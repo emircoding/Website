@@ -11,15 +11,22 @@
   /* ---------- Firmendaten aus config.js einsetzen ---------- */
   function applyConfig() {
     var map = {
-      name: C.name, owner: C.owner, street: C.street, zipcity: (C.zip || "") + " " + (C.city || ""),
+      name: C.name, legalName: C.legalName || C.name, owner: C.owner, street: C.street, zipcity: (C.zip || "") + " " + (C.city || ""),
       phoneDisplay: C.phoneDisplay, email: C.email, vatId: C.vatId, register: C.register,
       address: C.street + ", " + C.zip + " " + C.city, year: String(new Date().getFullYear())
     };
     document.querySelectorAll("[data-cfg]").forEach(function (el) {
       var k = el.getAttribute("data-cfg");
       if (map[k] != null && map[k] !== "") el.textContent = map[k];
-      else if (k === "register") el.closest("[data-optional]") && (el.closest("[data-optional]").hidden = true);
     });
+    // Optionale Impressums-Abschnitte ausblenden, wenn leer
+    document.querySelectorAll("[data-optional]").forEach(function (el) {
+      var v = C[el.getAttribute("data-optional")];
+      el.hidden = !(v && String(v).trim());
+    });
+    // Hinweis „Platzhalter“ nur zeigen, solange noch Beispieldaten eingetragen sind
+    var placeholders = /Muster|000 000|0000000/.test([C.owner, C.street, C.phone, C.phoneDisplay, C.whatsapp].join(" "));
+    document.querySelectorAll("[data-placeholder-notice]").forEach(function (el) { el.hidden = !placeholders; });
     var maps = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.name + ", " + C.street + ", " + C.zip + " " + C.city);
     var hrefs = { tel: "tel:" + C.phone, mail: "mailto:" + C.email, wa: "https://wa.me/" + C.whatsapp, maps: maps, mobilede: C.mobileDeUrl || mobileDeEmbedUrl() || "https://www.mobile.de/" };
     document.querySelectorAll("[data-href]").forEach(function (el) {
@@ -109,7 +116,7 @@
       el.setAttribute("aria-label", "Cookie-Einstellungen");
       el.innerHTML =
         '<div class="consent__head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 12.5A9 9 0 1 1 11.5 3a3 3 0 0 0 3.5 3.5 3 3 0 0 0 3.5 3.5 3 3 0 0 0 2.5 2.5z"/><circle cx="8.5" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="15.5" r="1" fill="currentColor"/><circle cx="16" cy="13" r=".8" fill="currentColor"/><circle cx="8" cy="15" r=".6" fill="currentColor"/></svg><strong>Cookies &amp; Datenschutz</strong></div>' +
-        '<p class="consent__text">Wir verwenden nur technisch notwendige Speicherungen. Für die Anzeige unseres Fahrzeugbestands binden wir Inhalte von <b>mobile.de</b> ein – dabei kann mobile.de Cookies setzen und Daten wie Ihre IP-Adresse erhalten. Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>' +
+        '<p class="consent__text">Wir verwenden nur technisch notwendige Speicherungen. Für die Anzeige unseres Fahrzeugbestands binden wir Inhalte von <b>mobile.de</b> ein – dabei kann mobile.de Cookies setzen und Daten wie Ihre IP-Adresse erhalten. Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a> und im <a href="impressum.html">Impressum</a>.</p>' +
         '<div class="consent__details" hidden>' +
         '<label class="consent__opt"><span><b>Notwendig</b><small>Speichert Ihre Auswahl und sorgt für die Grundfunktionen der Seite.</small></span><input type="checkbox" checked disabled><i class="switch"></i></label>' +
         '<label class="consent__opt"><span><b>Externe Inhalte – mobile.de</b><small>Zeigt unseren kompletten Fahrzeugbestand direkt von mobile.de an.</small></span><input type="checkbox" data-opt="external"><i class="switch"></i></label>' +

@@ -58,7 +58,10 @@ Die Website funktioniert unter **jedem** Projektnamen – es ist nirgends eine f
 Alle Kontaktdaten stehen zentral in **`assets/js/config.js`** (Adresse, Telefon, WhatsApp, E-Mail, USt-IdNr., Öffnungszeiten, mobile.de-Link).
 Einmal dort ändern → alle Seiten, Footer, Impressum, Buttons übernehmen es automatisch.
 
-⚠️ **Vor dem offiziellen Start:** echte Daten eintragen, im Impressum den gelben Hinweis entfernen und die Datenschutzerklärung prüfen lassen.
+⚠️ **Vor dem offiziellen Start:** echte Daten eintragen – vor allem `legalName` (Firmenname mit Rechtsform), `owner`, Adresse, Telefon, `vatId` und ggf. `register` (Handelsregister). Solange Platzhalter drin sind, zeigen Impressum und Datenschutz einen gelben Hinweis; er verschwindet automatisch, sobald echte Daten eingetragen sind. Leere Felder (z. B. USt-IdNr.) werden im Impressum automatisch ausgeblendet.
+
+**Rechtliches – bereits umgesetzt:** Impressum nach § 5 DDG (ohne den seit 20.07.2025 abgeschafften OS-Plattform-Link), ausführliche Datenschutzerklärung nach Art. 13 DSGVO, Cookie-Banner mit gleichwertiger Ablehnen-Option und Widerruf über „Cookie-Einstellungen“ im Footer, mobile.de wird erst nach Einwilligung geladen, Schriften lokal (Lizenzen in `assets/fonts/`), kein Tracking.
+In Cloudflare **keine „Web Analytics“ aktivieren**, ohne die Datenschutzerklärung und den Cookie-Banner anzupassen.
 
 ## 4. mobile.de verbinden (Bestand)
 

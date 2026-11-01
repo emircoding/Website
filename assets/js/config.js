@@ -6,7 +6,8 @@
    ========================================================================== */
 window.AZN_CONFIG = {
   name: "Automobilzentrum Nagold",
-  owner: "Inhaber: Max Mustermann",          // Impressum: Inhaber / Geschäftsführer
+  legalName: "",                              // Impressum: vollständiger Firmenname inkl. Rechtsform, z. B. "Automobilzentrum Nagold GmbH" oder "Max Mustermann e.K." (leer = name)
+  owner: "Inhaber: Max Mustermann",          // Impressum: "Inhaber: …" (Einzelunternehmen) bzw. "Geschäftsführer: …" (GmbH)
   street: "Musterstraße 1",                   // TODO: echte Adresse
   zip: "72202",
   city: "Nagold",
@@ -16,7 +17,7 @@ window.AZN_CONFIG = {
   whatsapp: "4917000000000",                  // WhatsApp-Nummer ohne + und ohne 0 am Anfang
   email: "info@automobilzentrum-nagold.de",
 
-  vatId: "DE000000000",                       // Impressum: USt-IdNr.
+  vatId: "",                                  // Impressum: USt-IdNr. (leer lassen, wenn keine vorhanden)
   register: "",                               // Impressum: z. B. "Amtsgericht Stuttgart HRB 000000" (leer lassen, wenn nicht vorhanden)
 
   hours: [
