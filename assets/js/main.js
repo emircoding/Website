@@ -8,6 +8,21 @@
   var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var root = document.documentElement;
 
+  /* ---------- Beim Neuladen immer ganz oben starten ---------- */
+  try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch (e) { /* ok */ }
+  var nav = window.performance && performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
+  var isReload = nav ? nav.type === "reload" : (window.performance && performance.navigation && performance.navigation.type === 1);
+  function toTop() {
+    try { window.scrollTo({ top: 0, left: 0, behavior: "instant" }); } catch (e) { window.scrollTo(0, 0); }
+  }
+  if (isReload) {
+    // Sprungmarke (z. B. #kontakt) beim Neuladen entfernen, damit es oben losgeht
+    if (location.hash) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) { /* ok */ } }
+    toTop();
+    document.addEventListener("DOMContentLoaded", toTop);
+    window.addEventListener("load", function () { toTop(); setTimeout(toTop, 0); });
+  }
+
   /* ---------- Firmendaten aus config.js einsetzen ---------- */
   function applyConfig() {
     var map = {
