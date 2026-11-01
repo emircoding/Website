@@ -15,7 +15,7 @@ window.AZN_CONFIG = {
   phone: "+4915901484988",                    // für Klick-zum-Anrufen (ohne Leerzeichen)
   phoneDisplay: "01590 1484988",              // so wird die Nummer angezeigt
   whatsapp: "4915901484988",                  // WhatsApp-Nummer ohne + und ohne 0 am Anfang
-  email: "automobilzentrum.nagold@gmail.com",
+  email: "emir742001@gmail.com",               // TEST – danach zurück auf automobilzentrum.nagold@gmail.com
 
   vatId: "",                                  // Impressum: USt-IdNr. (leer lassen, wenn keine vorhanden)
   register: "",                               // Impressum: z. B. "Amtsgericht Stuttgart HRB 000000" (leer lassen, wenn nicht vorhanden)
