@@ -15,6 +15,8 @@ assets/js/config.js   ★ FIRMENDATEN (Adresse, Telefon, WhatsApp, Öffnungszeit
 assets/css/style.css  Design & Animationen
 assets/img/           Logo, Icons, Vorschaubild
 assets/fonts/         Schriften (lokal → DSGVO-konform, kein Google Fonts)
+assets/3d/            3D-Auto (glTF-Modell)
+assets/vendor/three/  three.js (3D-Darstellung, MIT-Lizenz)
 _headers              Sicherheits- & Cache-Einstellungen (nur Cloudflare Pages)
 api/                  Formular-Versand per E-Mail + PDF beim Ankauf (PHP)
 .htaccess             Einstellungen für normale Webhoster (Apache)
@@ -93,6 +95,14 @@ Beim Absenden öffnet sich ein Auswahl-Menü **„Womit möchten Sie senden?“*
 In der gewählten App ist die E-Mail fertig vorbereitet (Empfänger, Betreff, freundlich formulierter Text mit allen Angaben). Fotos hängt der Kunde dort selbst an. Fehlende Pflichtfelder werden vorher rot markiert.
 
 **Später mit Webspace + PHP: `formMode: "server"`** – dann senden die Formulare direkt (ohne Mail-App), beim Ankauf mit Foto-Upload und PDF-Anhang (Ordner `api/`). Beim Umschalten bitte Bescheid geben, damit die Datenschutzerklärung angepasst wird.
+
+## 8. 3D-Auto auf der Startseite
+
+Das Auto im großen Startbereich ist ein echtes 3D-Modell (three.js, Dateien lokal in `assets/vendor/three/` und `assets/3d/auto.glb`, ca. 3 MB). Es fährt ein, und beim Scrollen gehen Licht an, der Reifen qualmt und es fährt weg.
+- **Zurück zum gezeichneten Auto:** in `assets/js/config.js` `auto3d: false` setzen.
+- **Komplette Sicherung des Stands vor dem 3D-Auto:** GitHub-Branch `sicherung-vor-3d-auto`.
+- Ohne WebGL (sehr alte Geräte) erscheint automatisch das gezeichnete Auto.
+- Modell: „Car Concept“ von Eric Chadwick / Darmstadt Graphics Group, CC BY 4.0 (Namensnennung steht im Impressum – nicht entfernen).
 
 ## 7. Google-Bewertungen
 

@@ -399,6 +399,12 @@ ul { margin: 0; padding: 0; list-style: none; }
   transition: transform 1.2s var(--ease);
 }
 .hero__car { width: 100%; height: auto; transform: translateX(-120vw); }
+/* Echtes 3D-Auto: liegt exakt über dem gezeichneten Auto und ersetzt es, sobald es geladen ist */
+.hero__car-drive { position: relative; }
+.hero__car3d { position: absolute; left: 0; bottom: -6%; width: 100%; pointer-events: none; opacity: 0; transition: opacity .9s var(--ease); }
+.has-3d .hero__car3d { opacity: 1; }
+.has-3d .hero__car-drive > svg.hero__car { opacity: 0; transition: opacity .9s var(--ease); }
+.hero__car3d.no-intro { animation: none !important; transform: none !important; }
 .hero__word { transition: transform 1.2s var(--ease); }
 [data-parallax] { translate: 0 var(--py, 0px); }
 .is-ready .hero__car { animation: driveIn 2.2s .55s var(--ease) forwards; }

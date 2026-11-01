@@ -41,6 +41,11 @@ window.AZN_CONFIG = {
   // Optional (nur für Profis): komplett eigene Einbettungs-Adresse statt der Standard-Adresse.
   mobileDeEmbed: "",
 
+  // ===== Startseite =====
+  // true  = echtes 3D-Auto (fährt beim Scrollen weg)
+  // false = das vorherige gezeichnete Auto (falls das 3D-Auto nicht gefällt)
+  auto3d: true,
+
   // ===== Formulare =====
   // "mail"   = Absenden öffnet ein Auswahl-Menü (Mail-App, Gmail, Outlook, WhatsApp) mit fertiger E-Mail.
   //            Fotos hängt der Kunde selbst in seiner Mail an. Funktioniert überall, ohne Server.

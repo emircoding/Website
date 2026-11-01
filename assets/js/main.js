@@ -392,6 +392,9 @@
     var rearA = 0, frontA = 0, lastX = 0, lastT = 0, accEx = 0, accTire = 0, accLine = 0, visible = true;
     function goLive() { if (live) return; live = true; hero.classList.add("is-live"); }
     svg.addEventListener("animationend", function (e) { if (e.animationName === "driveIn") goLive(); });
+    // 3D-Auto (falls geladen) übernimmt Räder und Licht; das gezeichnete Auto bleibt als Rückfall
+    var D3 = function () { return window.AZN3D && window.AZN3D.ready ? window.AZN3D : null; };
+    hero.addEventListener("animationend", function (e) { if (e.animationName === "driveIn" && e.target.classList.contains("hero__car3d")) goLive(); });
     setTimeout(goLive, 3200);
 
     function read() {
@@ -428,28 +431,36 @@
       var tilt = -(burn * 1.1 + Math.min(1, g * 5) * .7 * (1 - g));
       drive.style.transform = "translate3d(" + x.toFixed(1) + "px," + jit.toFixed(2) + "px,0) rotate(" + tilt.toFixed(3) + "deg)";
 
-      var rect = svg.getBoundingClientRect(), hr = hero.getBoundingClientRect();
+      var d3 = D3();
+      var rect = (d3 ? d3.canvas : svg).getBoundingClientRect(), hr = hero.getBoundingClientRect();
       carW = rect.width || carW;
       var k = carW / 900; // Maßstab: SVG-Einheit → Pixel
       var wheelR = 50 * k, dx = x - lastX, vx = dx / Math.max(dt, .001); lastX = x;
       var roll = dx / wheelR * 57.2958;
-      if (live) {
+      var tail = Math.min(1, lights * .55 + burn * .45 + Math.min(1, g * 4) * .2);
+      if (d3) { d3.state.lights = lights; d3.state.tail = tail; d3.state.burn = live ? burn : 0; }
+      if (live && !d3) {
         rearA += roll + burn * 1700 * dt;
         frontA += roll;
         if (wheels[0]) wheels[0].style.transform = "rotate(" + rearA.toFixed(1) + "deg)";
         if (wheels[1]) wheels[1].style.transform = "rotate(" + frontA.toFixed(1) + "deg)";
       }
       svg.style.setProperty("--lights", lights.toFixed(3));
-      svg.style.setProperty("--tail", Math.min(1, lights * .55 + burn * .45 + Math.min(1, g * 4) * .2).toFixed(3));
+      svg.style.setProperty("--tail", tail.toFixed(3));
       hero.style.setProperty("--hint", (1 - clamp(s / .04)).toFixed(3));
 
       // Partikel erzeugen (Koordinaten relativ zum Hero)
       var ox = rect.left - hr.left, oy = rect.top - hr.top, sy = rect.height / 290;
+      var exX = ox + 60 * k, exY = oy + 203 * sy, tiX = ox + 190 * k, tiY = oy + 258 * sy;
+      if (d3 && lightsOn && visible) { // Positionen aus der 3D-Szene
+        var an = d3.anchors();
+        exX = an.exhaust.x - hr.left; exY = an.exhaust.y - hr.top; tiX = an.tire.x - hr.left; tiY = an.tire.y - hr.top; k = an.scale;
+      }
       if (lightsOn && visible) {
         accEx += (5 + burn * 26 + Math.min(1, g * 3) * 14 * (1 - g)) * dt;
-        while (accEx >= 1) { accEx--; emit("exhaust", ox + 60 * k, oy + 203 * sy, k); }
+        while (accEx >= 1) { accEx--; emit("exhaust", exX, exY, k); }
         accTire += (burn * 75 + (g > 0 && g < .55 ? 55 * (1 - g / .55) : 0)) * dt;
-        while (accTire >= 1) { accTire--; emit("tire", ox + 190 * k, oy + 258 * sy, k); }
+        while (accTire >= 1) { accTire--; emit("tire", tiX, tiY, k); }
         if (vx > 900) {
           accLine += Math.min(40, vx / 60) * dt;
           while (accLine >= 1) { accLine--; emit("line", ox - Math.random() * 120 * k, oy + (60 + Math.random() * 190) * sy, k); }
@@ -950,9 +961,21 @@
     magnetic();
     forms();
     preloader(function () {
-      root.classList.add("is-ready");
-      observe(document);
-      heroDrive();
+      var started = false;
+      var go = function () {
+        if (started) return; started = true;
+        root.classList.add("is-ready");
+        observe(document);
+        heroDrive();
+      };
+      // Startseite: kurz aufs 3D-Auto warten (max. 2,5 s), damit es selbst einfährt – sonst fährt das gezeichnete Auto
+      if (!document.querySelector("[data-hero-pin]")) return go();
+      var t0 = Date.now();
+      (function wait() {
+        if (window.AZN3D) return Promise.race([window.AZN3D.whenReady, new Promise(function (r) { setTimeout(r, Math.max(0, 2500 - (Date.now() - t0))); })]).then(go);
+        if (Date.now() - t0 > 2500) return go();
+        setTimeout(wait, 60);
+      })();
     });
   });
 
