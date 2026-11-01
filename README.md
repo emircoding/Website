@@ -38,7 +38,7 @@ Einmalig einrichten (geht auch vom Handy aus, ca. 3 Minuten):
 2. **Workers & Pages** → **Create** → Reiter **Pages** → **Connect to Git**.
 3. GitHub verbinden und das Repository **emircoding/Website** auswählen.
 4. Einstellungen:
-   - **Project name:** `automobilzentrum-nagold` → Adresse wird `https://automobilzentrum-nagold.pages.dev`
+   - **Project name:** frei wählbar – daraus wird die Adresse `https://PROJEKTNAME.pages.dev`
    - **Production branch:** `main`
    - **Framework preset:** `None`
    - **Build command:** *(leer lassen)*
@@ -46,9 +46,12 @@ Einmalig einrichten (geht auch vom Handy aus, ca. 3 Minuten):
 5. **Save and Deploy** – fertig. Die Seite ist dauerhaft online.
 
 Ab dann gilt: **Jede Änderung, die auf GitHub in `main` landet, ist nach ca. 30 Sekunden automatisch live.**
-Eigene Domain (z. B. `automobilzentrum-nagold.de`) später unter Projekt → **Custom domains** hinzufügen.
 
-> Wenn ein anderer Projektname gewählt wird, die Adresse in `robots.txt`, `sitemap.xml` und oben im Skript der HTML-Seiten (`canonical`/`og:url`) anpassen.
+Die Website funktioniert unter **jedem** Projektnamen – es ist nirgends eine feste Adresse eingetragen.
+
+**Anderen pages.dev-Namen gewünscht?** Cloudflare kann Projekte nicht umbenennen. Stattdessen: neues Pages-Projekt mit dem Wunschnamen (z. B. `automobilzentrum-nagold`) aus demselben Repository anlegen (Schritte oben) und das alte Projekt unter *Settings → Delete project* löschen.
+
+**Eigene Domain** (z. B. `automobilzentrum-nagold.de`): im Projekt unter **Custom domains** hinzufügen. Danach die Domain in der Datei-Vorlage als feste Adresse hinterlegen lassen (für Google & Link-Vorschauen).
 
 ## 3. Firmendaten eintragen
 
