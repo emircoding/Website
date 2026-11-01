@@ -94,6 +94,11 @@ In der gewählten App ist die E-Mail fertig vorbereitet (Empfänger, Betreff, fr
 
 **Später mit Webspace + PHP: `formMode: "server"`** – dann senden die Formulare direkt (ohne Mail-App), beim Ankauf mit Foto-Upload und PDF-Anhang (Ordner `api/`). Beim Umschalten bitte Bescheid geben, damit die Datenschutzerklärung angepasst wird.
 
+## 7. Google-Bewertungen
+
+Echte Werte in `assets/js/config.js` unter `google` eintragen (Note, Anzahl, Profil-Link, ausgewählte Bewertungen). Solange keine Note eingetragen ist, zeigt die Startseite einen Aufruf zum Bewerten.
+**Design-Vorschau nur für euch:** Startseite mit `?vorschau` am Ende der Adresse öffnen (z. B. `…pages.dev/?vorschau`) – zeigt deutlich markierte Beispielkarten. Besucher sehen das nie. (Erfundene Bewertungen dürfen nicht veröffentlicht werden – § 5b UWG / Anhang UWG.)
+
 ## 6. Eigene Domain & Webhoster
 
 1. Webhosting-Paket mit PHP bei einem Anbieter buchen (Domain meist inklusive).

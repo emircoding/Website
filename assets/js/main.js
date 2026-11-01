@@ -510,6 +510,18 @@
     var G = C.google || {};
     if (!sec) return;
     sec.hidden = false;
+    // Nur für den Inhaber: Design-Vorschau mit deutlich markierten Beispieltexten (Adresse mit ?vorschau öffnen).
+    // Öffentliche Besucher sehen das nie – erfundene Bewertungen dürfen nicht veröffentlicht werden.
+    var preview = !(G.rating > 0) && /[?&]vorschau\b/.test(location.search);
+    if (preview) {
+      G = { rating: 4.9, count: 0, reviews: [
+        { name: "Beispiel", stars: 5, date: "Platzhalter", text: "BEISPIELTEXT – hier erscheint später eine echte Bewertung aus eurem Google-Profil." },
+        { name: "Beispiel", stars: 5, date: "Platzhalter", text: "BEISPIELTEXT – so sieht eine Bewertungskarte aus. Lange Texte werden nach einigen Zeilen gekürzt." },
+        { name: "Beispiel", stars: 5, date: "Platzhalter", text: "BEISPIELTEXT – drei bis sechs der besten Google-Bewertungen werden hier gezeigt." }
+      ] };
+      sec.classList.add("reviews--preview");
+      sec.querySelector(".container").insertAdjacentHTML("afterbegin", '<p class="preview-banner">Vorschau mit Beispieltexten – nur über ?vorschau sichtbar, nicht für Besucher. Zahlen und Texte sind Platzhalter.</p>');
+    }
     if (!(G.rating > 0)) {
       // Noch keine Google-Daten eingetragen: Aufruf zum Bewerten statt Sternen/Zahlen
       sec.classList.add("reviews--cta");

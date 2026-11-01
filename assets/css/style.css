@@ -988,6 +988,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .stars--outline .star { background: #d3d2ce; transition: background .25s; }
 .stars--outline:hover .star { background: #f2a900; }
 .stars--outline .star:hover ~ .star { background: #d3d2ce; }
+.preview-banner { background: #fff6d6; border: 1px dashed #c99a2e; color: #6b4e00; padding: 10px 14px; border-radius: 8px; font-size: 13.5px; margin-bottom: 28px; }
+.reviews--preview .review { outline: 2px dashed #c99a2e; outline-offset: -2px; }
 .reviews__track {
   display: grid; grid-auto-flow: column; grid-auto-columns: minmax(300px, 1fr);
   gap: clamp(14px, 1.6vw, 24px); overflow-x: auto; scroll-snap-type: x mandatory;
