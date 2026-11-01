@@ -7,16 +7,14 @@ Reines HTML/CSS/JavaScript – **kein Build-Schritt, keine Installation nötig.*
 
 ```
 index.html            Startseite
-fahrzeuge.html        Fahrzeugbestand (Filter, Suche, Merkliste, Detailansicht)
+fahrzeuge.html        Fahrzeugbestand (live von mobile.de eingebettet)
 impressum.html        Impressum
 datenschutz.html      Datenschutzerklärung
 404.html              Fehlerseite
 assets/js/config.js   ★ FIRMENDATEN (Adresse, Telefon, WhatsApp, Öffnungszeiten …)
-assets/js/demo-fahrzeuge.js  Demo-Bestand (bis mobile.de verbunden ist)
 assets/css/style.css  Design & Animationen
 assets/img/           Logo, Icons, Vorschaubild
 assets/fonts/         Schriften (lokal → DSGVO-konform, kein Google Fonts)
-functions/api/fahrzeuge.js   Live-Schnittstelle zu mobile.de (Cloudflare)
 _headers              Sicherheits- & Cache-Einstellungen für Cloudflare
 ```
 
@@ -24,7 +22,7 @@ _headers              Sicherheits- & Cache-Einstellungen für Cloudflare
 
 **Variante A – ZIP (am einfachsten):**
 GitHub öffnen → Repository `emircoding/Website` → grüner Button **Code** → **Download ZIP** → ZIP in den gewünschten Windows-Ordner entpacken.
-Doppelklick auf `index.html` öffnet die Seite direkt im Browser (dann mit Demo-Fahrzeugen).
+Doppelklick auf `index.html` öffnet die Seite direkt im Browser.
 
 **Variante B – mit Git (für spätere Updates):**
 ```powershell
@@ -61,23 +59,20 @@ Einmal dort ändern → alle Seiten, Footer, Impressum, Buttons übernehmen es a
 
 ## 4. mobile.de verbinden (Live-Bestand)
 
-Die Website ist fertig vorbereitet: Die Datei `functions/api/fahrzeuge.js` holt den Bestand über die **mobile.de Search-API** und aktualisiert ihn alle 5 Minuten. Alles kommt direkt von mobile.de: **Fotos, Preis, Daten, Ausstattung, Beschreibung und der Link zum Inserat**. Neue Inserate erscheinen automatisch, verkaufte verschwinden automatisch – auf der Website muss nie etwas von Hand gepflegt werden.
+Die Seite **Fahrzeuge** zeigt oben das eigene Design und darunter den **kompletten Bestand direkt von mobile.de** (eingebettet).
+Alles synchronisiert sich automatisch: Neue Inserate erscheinen sofort, Änderungen und Fotos werden übernommen, verkaufte Fahrzeuge verschwinden – auf der Website muss nie etwas gepflegt werden.
 
-Hat ein Fahrzeug (noch) keine Fotos, wird ein **mobile.de-Platzhalter** angezeigt. Wer statt des Schriftzugs das offizielle mobile.de-Logo möchte: Logo-Datei (z. B. aus dem mobile.de-Händlerbereich) als `assets/img/mobile-de.svg` ablegen und in `config.js` bei `mobileDeLogo` eintragen.
+**Einrichtung (einmalig):**
+1. Im mobile.de-Händlerbereich die **Kunden-ID** heraussuchen (Verwaltung / Stammdaten).
+2. In `assets/js/config.js` eintragen: `mobileDeCustomerId: "12345678",`
+3. Optional bei `mobileDeUrl` die Adresse der eigenen Händlerseite eintragen (für „In neuem Tab öffnen“).
+4. Speichern und hochladen – fertig.
 
-1. Bei mobile.de (Händlerbereich bzw. Händler-Support) **API-Zugang für die Search-API** anfordern. Man erhält Benutzername + Passwort; die **Kundennummer** steht im Händlerbereich.
-2. Cloudflare → Projekt → **Settings** → **Variables and Secrets** → für *Production* hinzufügen:
-   | Name | Wert |
-   |---|---|
-   | `MOBILE_DE_USER` | API-Benutzername |
-   | `MOBILE_DE_PASSWORD` | API-Passwort (Typ **Secret**) |
-   | `MOBILE_DE_CUSTOMER_NUMBER` | Kundennummer |
-3. Unter **Deployments** beim letzten Deployment **Retry deployment** klicken.
-4. Prüfen: `https://automobilzentrum-nagold.pages.dev/api/fahrzeuge` zeigt die Fahrzeuge als JSON. Auf der Fahrzeugseite steht dann grün **„Live-Bestand von mobile.de“**.
+Eingebunden wird die offizielle Händler-Einbindung von mobile.de:
+`https://home.mobile.de/home/index.html?partnerHead=false&colorTheme=default&customerId=KUNDEN-ID`
+Falls mobile.de Ihnen im Händlerbereich einen anderen Einbindungs-Link nennt, diesen bei `mobileDeEmbed` in `config.js` eintragen.
 
-Solange keine Zugangsdaten hinterlegt sind (oder mobile.de nicht erreichbar ist), zeigt die Seite automatisch den Demo-Bestand – nichts geht kaputt.
-
-> Hinweis: Die Feldzuordnung in `fahrzeuge.js` folgt der öffentlichen Dokumentation der mobile.de Search-API. Sobald echte Zugangsdaten da sind, einmal mit echten Daten prüfen (v. a. Bild-URLs) und ggf. feinjustieren.
+Auf der Startseite gibt es dazu einen animierten Teaser „Unser Bestand – live von mobile.de“, der auf die Fahrzeugseite führt.
 
 ## Technik & Features
 
@@ -85,9 +80,9 @@ Solange keine Zugangsdaten hinterlegt sind (oder mobile.de nicht erreichbar ist)
 - **Scroll-Fahrt:** Beim Scrollen startet der Motor – Licht flackert an, Auspuff raucht, Hinterräder drehen durch mit Reifenqualm (Burnout), dann zieht das Auto aus dem Bild. Zurückscrollen spult alles rückwärts. Rauch als Partikel-Animation (flüssig auch auf dem iPhone)
 - Wort-für-Wort-Einblendungen, Scroll-Text-Effekt, Zähler, Parallax, Laufband, magnetische Buttons, 3D-Kipp-Effekt der Fahrzeugkarten
 - Logo mit animiertem Chrom-Glanz
-- Fahrzeugsuche mit Filtern (Marke, Preis, Kraftstoff, Getriebe), Sortierung, Merkliste, Detail-Ansicht mit Bildergalerie (Wischen auf dem iPhone)
-- Anfragen direkt per WhatsApp, Telefon oder E-Mail (vorausgefüllt mit Fahrzeugdaten)
+- Fahrzeugbestand komplett live von mobile.de eingebettet (automatische Synchronisierung)
+- Anfragen direkt per WhatsApp, Telefon oder E-Mail
 - „Jetzt geöffnet“-Anzeige anhand der Öffnungszeiten
 - iPhone: Safe-Area (Notch/Dynamic Island), kein Auto-Zoom bei Formularen, Homescreen-Icon, flüssiges Scrollen
 - Barrierearm: Tastaturbedienung, `prefers-reduced-motion` wird respektiert
-- DSGVO: keine Cookies, kein Tracking, Schriften lokal
+- DSGVO: eigene Seite ohne Cookies und Tracking, Schriften lokal (die eingebettete mobile.de-Seite ist in der Datenschutzerklärung erwähnt)

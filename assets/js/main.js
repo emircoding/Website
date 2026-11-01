@@ -21,7 +21,7 @@
       else if (k === "register") el.closest("[data-optional]") && (el.closest("[data-optional]").hidden = true);
     });
     var maps = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.name + ", " + C.street + ", " + C.zip + " " + C.city);
-    var hrefs = { tel: "tel:" + C.phone, mail: "mailto:" + C.email, wa: "https://wa.me/" + C.whatsapp, maps: maps, mobilede: C.mobileDeUrl };
+    var hrefs = { tel: "tel:" + C.phone, mail: "mailto:" + C.email, wa: "https://wa.me/" + C.whatsapp, maps: maps, mobilede: C.mobileDeUrl || mobileDeEmbedUrl() || "https://www.mobile.de/" };
     document.querySelectorAll("[data-href]").forEach(function (el) {
       var h = hrefs[el.getAttribute("data-href")];
       if (h) el.setAttribute("href", h);
@@ -42,6 +42,32 @@
       badge.classList.toggle("is-open", open);
       badge.querySelector("span").textContent = open ? "Jetzt geöffnet" : "Aktuell geschlossen";
     }
+  }
+
+  /* ---------- mobile.de: kompletter Live-Bestand eingebettet ---------- */
+  function mobileDeEmbedUrl() {
+    if (C.mobileDeEmbed) return C.mobileDeEmbed;
+    var id = String(C.mobileDeCustomerId || "").trim();
+    return id ? "https://home.mobile.de/home/index.html?partnerHead=false&colorTheme=default&customerId=" + encodeURIComponent(id) : "";
+  }
+  function mobileDeEmbed() {
+    var box = document.querySelector("[data-mde-embed]");
+    if (!box) return;
+    var status = box.querySelector("[data-mde-status]"), url = mobileDeEmbedUrl();
+    if (!url) {
+      var st = box.querySelector(".mde-frame__state");
+      st.insertAdjacentHTML("beforeend", "<p>Hier erscheint der komplette Fahrzeugbestand live von mobile.de. Dafür einmal die mobile.de-Kunden-ID in <code>assets/js/config.js</code> eintragen.</p>");
+      if (status) status.textContent = "Noch nicht verbunden";
+      return;
+    }
+    var f = document.createElement("iframe");
+    f.src = url;
+    f.title = "Fahrzeugbestand auf mobile.de";
+    f.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+    f.setAttribute("allow", "fullscreen; clipboard-write");
+    f.addEventListener("load", function () { box.classList.add("is-loaded"); });
+    box.appendChild(f);
+    setTimeout(function () { if (!box.classList.contains("is-loaded") && status) status.textContent = "Lädt länger als üblich …"; }, 8000);
   }
 
   /* ---------- Preloader (nur beim ersten Besuch pro Sitzung) ---------- */
@@ -378,6 +404,7 @@
   /* ---------- Start ---------- */
   document.addEventListener("DOMContentLoaded", function () {
     applyConfig();
+    mobileDeEmbed();
     splitHeadings();
     prepStatement();
     plx = Array.prototype.slice.call(document.querySelectorAll("[data-parallax]"));

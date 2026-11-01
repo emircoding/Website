@@ -27,14 +27,16 @@ window.AZN_CONFIG = {
   // Für die Anzeige „Jetzt geöffnet / geschlossen“ (leer = geschlossen)
   schedule: { mo: "09:00-18:00", di: "09:00-18:00", mi: "09:00-18:00", do: "09:00-18:00", fr: "09:00-18:00", sa: "10:00-14:00", so: "" },
 
-  // Link zur Händlerseite auf mobile.de (Button „Gesamter Bestand auf mobile.de“)
-  mobileDeUrl: "https://www.mobile.de/",
+  // ===== mobile.de =====
+  // Ihre Kunden-ID bei mobile.de (steht im mobile.de-Händlerbereich, z. B. "12345678").
+  // Sobald sie hier steht, zeigt die Seite „Fahrzeuge“ automatisch den kompletten
+  // Live-Bestand von mobile.de – neue Fahrzeuge erscheinen sofort, verkaufte verschwinden.
+  mobileDeCustomerId: "",
 
-  // Optional: offizielles mobile.de-Logo als Datei (z. B. "assets/img/mobile-de.svg").
-  // Leer lassen = Schriftzug „mobile.de“ als Platzhalter bei Fahrzeugen ohne Fotos.
-  mobileDeLogo: "",
+  // Optional: Adresse Ihrer Händlerseite auf mobile.de (für „In neuem Tab öffnen“),
+  // z. B. "https://home.mobile.de/AUTOMOBILZENTRUMNAGOLD". Leer = wird aus der Kunden-ID gebildet.
+  mobileDeUrl: "",
 
-  // Live-Bestand: wird automatisch von mobile.de geladen, sobald in Cloudflare
-  // die Zugangsdaten hinterlegt sind (siehe README.md). Bis dahin: Demo-Fahrzeuge.
-  inventoryApi: "/api/fahrzeuge"
+  // Optional (nur für Profis): komplett eigene Einbettungs-Adresse statt der Standard-Adresse.
+  mobileDeEmbed: ""
 };
