@@ -527,7 +527,16 @@
 
   /* ---------- Formulare: direkt senden über PHP (api/anfrage.php) ----------
      Ohne PHP (z. B. lokal oder auf pages.dev) öffnet sich stattdessen das E-Mail-Programm. */
-  var directP = null;
+  var directP = null, directNow = null;
+  // Kann der Browser Fotos an WhatsApp/Mail übergeben (Teilen-Menü)? – iPhone, Android, Windows-Chrome/Edge
+  var canShareFiles = (function () {
+    try { return !!(navigator.canShare && window.File && navigator.canShare({ files: [new File(["x"], "x.jpg", { type: "image/jpeg" })] })); }
+    catch (e) { return false; }
+  })();
+  function shareFiles(files, title, text) {
+    try { return navigator.share({ files: files, title: title, text: text }).then(function () { return true; }, function () { return false; }); }
+    catch (e) { return Promise.resolve(false); }
+  }
   function canDirect() {
     if (directP) return directP;
     directP = !/^https?:$/.test(location.protocol) ? Promise.resolve(false)
@@ -535,6 +544,7 @@
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (j) { return !!(j && j.enabled); })
         .catch(function () { return false; });
+    directP.then(function (v) { directNow = v; });
     return directP;
   }
   function postForm(fd, onProgress) {
@@ -615,8 +625,14 @@
     return {
       busy: function () { return items.some(function (i) { return i.status === "up"; }); },
       blobs: function () { return items.filter(function (i) { return i.status === "ok"; }).map(function (i) { return i.blob; }); },
+      files: function () {
+        return items.filter(function (i) { return i.status === "ok"; }).map(function (i, n) {
+          return new File([i.blob], "Foto-" + (n < 9 ? "0" : "") + (n + 1) + ".jpg", { type: "image/jpeg" });
+        });
+      },
       clear: function () { items.forEach(function (i) { if (i.thumb) URL.revokeObjectURL(i.thumb); }); items = []; render(); },
-      disable: function (msg) { enabled = false; box.classList.add("is-off"); input.disabled = true; note.textContent = msg; }
+      disable: function (msg) { enabled = false; box.classList.add("is-off"); input.disabled = true; note.textContent = msg; },
+      note: function (msg) { note.textContent = msg; }
     };
   }
 
@@ -627,12 +643,25 @@
     form.querySelector(".form__actions").after(status);
     var submit = form.querySelector("[type=submit]"), label = submit.innerHTML, sending = false;
     function say(t, err) { status.textContent = t; status.classList.toggle("is-error", !!err); }
+    // Ohne PHP: Fotos + Text über das Teilen-Menü (WhatsApp/Mail) – muss direkt im Klick passieren
+    function shareWithPhotos() {
+      if (!o.photos || !canShareFiles) return false;
+      if (o.photos.busy()) { say("Bitte kurz warten – die Fotos werden noch vorbereitet …"); return true; }
+      var files = o.photos.files();
+      if (!files.length) return false;
+      var text = o.text() + "\n\nAn: " + (C.name || "") + " – " + C.email + " · WhatsApp " + (C.phoneDisplay || "");
+      say("Wählen Sie jetzt WhatsApp oder Mail. Empfänger: " + C.email + " bzw. WhatsApp " + (C.phoneDisplay || ""));
+      shareFiles(files, o.subject(), text);
+      return true;
+    }
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (sending || !form.reportValidity()) return;
       if (o.check && !o.check(say)) return;
+      if (directNow === false && shareWithPhotos()) return;
       canDirect().then(function (direct) {
         if (!direct) { // Fallback: E-Mail-Programm öffnen
+          if (shareWithPhotos()) return;
           location.href = "mailto:" + C.email + "?subject=" + encodeURIComponent(o.subject()) + "&body=" + encodeURIComponent(o.text());
           return;
         }
@@ -662,6 +691,8 @@
     var wa = form.querySelector("[data-wa-send]");
     if (wa) wa.addEventListener("click", function () {
       if (!form.reportValidity()) return;
+      // Mit Fotos: Teilen-Menü (WhatsApp-Links können keine Bilder mitnehmen)
+      if (shareWithPhotos()) return;
       window.open("https://wa.me/" + C.whatsapp + "?text=" + encodeURIComponent(o.text()), "_blank", "noopener");
     });
   }
@@ -706,7 +737,11 @@
         reg.value = d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
       });
       var photos = photoPicker(ank);
-      canDirect().then(function (ok) { if (!ok && photos) photos.disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen."); });
+      canDirect().then(function (ok) {
+        if (!photos) return;
+        if (!ok && !canShareFiles) photos.disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen.");
+        else if (!ok) photos.note("Die Fotos werden beim Absenden über WhatsApp oder Mail mitgeschickt.");
+      });
       setupForm(ank, {
         photos: photos,
         thanks: "Ihre Fahrzeugdaten und Fotos sind bei uns eingegangen. Wir melden uns schnellstmöglich mit einem Angebot.",
