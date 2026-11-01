@@ -527,16 +527,7 @@
 
   /* ---------- Formulare: direkt senden über PHP (api/anfrage.php) ----------
      Ohne PHP (z. B. lokal oder auf pages.dev) öffnet sich stattdessen das E-Mail-Programm. */
-  var directP = null, directNow = null;
-  // Kann der Browser Fotos an WhatsApp/Mail übergeben (Teilen-Menü)? – iPhone, Android, Windows-Chrome/Edge
-  var canShareFiles = (function () {
-    try { return !!(navigator.canShare && window.File && navigator.canShare({ files: [new File(["x"], "x.jpg", { type: "image/jpeg" })] })); }
-    catch (e) { return false; }
-  })();
-  function shareFiles(files, title, text) {
-    try { return navigator.share({ files: files, title: title, text: text }).then(function () { return true; }, function () { return false; }); }
-    catch (e) { return Promise.resolve(false); }
-  }
+  var directP = null;
   function canDirect() {
     if (directP) return directP;
     directP = !/^https?:$/.test(location.protocol) ? Promise.resolve(false)
@@ -544,7 +535,6 @@
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (j) { return !!(j && j.enabled); })
         .catch(function () { return false; });
-    directP.then(function (v) { directNow = v; });
     return directP;
   }
   function postForm(fd, onProgress) {
@@ -625,54 +615,97 @@
     return {
       busy: function () { return items.some(function (i) { return i.status === "up"; }); },
       blobs: function () { return items.filter(function (i) { return i.status === "ok"; }).map(function (i) { return i.blob; }); },
-      files: function () {
-        return items.filter(function (i) { return i.status === "ok"; }).map(function (i, n) {
-          return new File([i.blob], "Foto-" + (n < 9 ? "0" : "") + (n + 1) + ".jpg", { type: "image/jpeg" });
-        });
-      },
       clear: function () { items.forEach(function (i) { if (i.thumb) URL.revokeObjectURL(i.thumb); }); items = []; render(); },
-      disable: function (msg) { enabled = false; box.classList.add("is-off"); input.disabled = true; note.textContent = msg; },
-      note: function (msg) { note.textContent = msg; }
+      disable: function (msg) {
+        enabled = false; box.classList.add("is-off"); input.disabled = true; note.textContent = "";
+        drop.querySelector("strong").textContent = "Foto-Versand noch nicht aktiv";
+        drop.querySelector("span").textContent = msg;
+      }
     };
+  }
+
+  /* Pflichtfelder prüfen: fehlende/falsche Felder rot markieren, Hinweis darunter */
+  function validate(form, extra) {
+    var bad = [];
+    function mark(el, msg) {
+      var f = el.closest(".field"); if (!f) return;
+      f.classList.add("is-invalid");
+      var e = f.querySelector(".field__err");
+      if (!e) { e = document.createElement("small"); e.className = "field__err"; f.appendChild(e); }
+      e.textContent = msg;
+      el.setAttribute("aria-invalid", "true");
+      if (bad.indexOf(el) < 0) bad.push(el);
+    }
+    form.querySelectorAll(".field.is-invalid").forEach(function (f) {
+      f.classList.remove("is-invalid");
+      var e = f.querySelector(".field__err"); if (e) e.remove();
+      var i = f.querySelector("[aria-invalid]"); if (i) i.removeAttribute("aria-invalid");
+    });
+    form.querySelectorAll("input, select, textarea").forEach(function (el) {
+      if (el.type === "hidden" || el.type === "file" || el.closest(".hp")) return;
+      var v = (el.value || "").trim();
+      if (el.required && !v) mark(el, el.tagName === "SELECT" ? "Bitte auswählen" : "Bitte ausfüllen");
+      else if (v && el.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) mark(el, "Bitte eine gültige E-Mail-Adresse eingeben");
+      else if (v && el.hasAttribute("data-reg") && !/^(0[1-9]|1[0-2])\/(19|20)\d{2}$/.test(v)) mark(el, "Bitte im Format MM/JJJJ, z. B. 03/2018");
+    });
+    if (extra) extra(mark);
+    return bad;
   }
 
   /* Gemeinsamer Ablauf für beide Formulare */
   function setupForm(form, o) {
     var status = document.createElement("p");
-    status.className = "form__status"; status.setAttribute("role", "status");
+    status.className = "form__status"; status.setAttribute("role", "status"); status.setAttribute("aria-live", "polite");
+    var bar = document.createElement("div");
+    bar.className = "form__progress"; bar.hidden = true; bar.innerHTML = "<i></i>";
     form.querySelector(".form__actions").after(status);
+    status.before(bar);
     var submit = form.querySelector("[type=submit]"), label = submit.innerHTML, sending = false;
-    function say(t, err) { status.textContent = t; status.classList.toggle("is-error", !!err); }
-    // Ohne PHP: Fotos + Text über das Teilen-Menü (WhatsApp/Mail) – muss direkt im Klick passieren
-    function shareWithPhotos() {
-      if (!o.photos || !canShareFiles) return false;
-      if (o.photos.busy()) { say("Bitte kurz warten – die Fotos werden noch vorbereitet …"); return true; }
-      var files = o.photos.files();
-      if (!files.length) return false;
-      var text = o.text() + "\n\nAn: " + (C.name || "") + " – " + C.email + " · WhatsApp " + (C.phoneDisplay || "");
-      say("Wählen Sie jetzt WhatsApp oder Mail. Empfänger: " + C.email + " bzw. WhatsApp " + (C.phoneDisplay || ""));
-      shareFiles(files, o.subject(), text);
-      return true;
+    function say(t, kind) { status.textContent = t; status.classList.toggle("is-error", kind === "err"); status.classList.toggle("is-busy", kind === "busy"); }
+    function busy(on) {
+      sending = on; submit.disabled = on; submit.classList.toggle("is-loading", on);
+      form.classList.toggle("is-sending", on);
+      bar.hidden = !on; if (on) bar.firstChild.style.width = "3%";
+      if (!on) submit.innerHTML = label;
+    }
+    // Rote Markierung verschwindet, sobald das Feld korrigiert wird
+    form.addEventListener("input", function (e) {
+      var f = e.target.closest(".field.is-invalid");
+      if (f && (e.target.value || "").trim()) { f.classList.remove("is-invalid"); var x = f.querySelector(".field__err"); if (x) x.remove(); e.target.removeAttribute("aria-invalid"); }
+      if (!form.querySelector(".field.is-invalid") && status.classList.contains("is-error")) say("");
+    });
+    form.addEventListener("change", function (e) { if (e.target.tagName === "SELECT") e.target.dispatchEvent(new Event("input", { bubbles: true })); });
+    function check() {
+      var bad = validate(form, o.extra);
+      if (!bad.length) return true;
+      say(bad.length === 1 ? "Bitte das rot markierte Feld ausfüllen." : "Bitte die " + bad.length + " rot markierten Felder ausfüllen.", "err");
+      bad[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+      setTimeout(function () { try { bad[0].focus({ preventScroll: true }); } catch (e) { bad[0].focus(); } }, 350);
+      return false;
     }
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      if (sending || !form.reportValidity()) return;
-      if (o.check && !o.check(say)) return;
-      if (directNow === false && shareWithPhotos()) return;
+      if (sending || !check()) return;
+      if (o.photos && o.photos.busy()) { say("Bitte kurz warten – die Fotos werden noch vorbereitet …", "busy"); return; }
+      busy(true);
+      submit.innerHTML = "Wird gesendet …";
+      say("Bitte warten – Ihre Anfrage wird gesendet" + (o.photos && o.photos.blobs().length ? " (mit Fotos kann das einige Sekunden dauern)" : "") + " …", "busy");
       canDirect().then(function (direct) {
-        if (!direct) { // Fallback: E-Mail-Programm öffnen
-          if (shareWithPhotos()) return;
-          location.href = "mailto:" + C.email + "?subject=" + encodeURIComponent(o.subject()) + "&body=" + encodeURIComponent(o.text());
+        if (!direct) {
+          busy(false);
+          say("Der Online-Versand ist hier noch nicht aktiv. Bitte nutzen Sie „Per WhatsApp“ oder rufen Sie uns an: " + (C.phoneDisplay || ""), "err");
           return;
         }
-        if (o.photos && o.photos.busy()) { say("Bitte kurz warten – die Fotos werden noch vorbereitet …"); return; }
-        sending = true; submit.disabled = true; say("");
-        submit.innerHTML = "Wird gesendet …";
         var fd = new FormData(form);
         if (o.photos) o.photos.blobs().forEach(function (b, i) { fd.append("fotos[]", b, "foto-" + (i + 1) + ".jpg"); });
-        postForm(fd, function (p) { submit.textContent = "Wird gesendet … " + Math.round(p * 100) + " %"; }).then(function (r) {
-          sending = false; submit.disabled = false; submit.innerHTML = label;
-          if (!r.ok) { say(errorText(r), true); return; }
+        postForm(fd, function (p) {
+          var pct = Math.max(3, Math.min(99, Math.round(p * 100)));
+          bar.firstChild.style.width = pct + "%";
+          submit.textContent = pct < 99 ? "Wird gesendet … " + pct + " %" : "Wird verarbeitet …";
+        }).then(function (r) {
+          busy(false);
+          if (!r.ok) { say(errorText(r), "err"); return; }
+          say("");
           var name = (new FormData(form).get("name") || "").split(" ")[0];
           var done = document.createElement("div");
           done.className = "form__done";
@@ -682,7 +715,7 @@
           form.classList.add("is-sent");
           form.appendChild(done);
           done.querySelector("button").addEventListener("click", function () {
-            form.reset(); if (o.photos) o.photos.clear(); say(""); done.remove(); form.classList.remove("is-sent");
+            form.reset(); if (o.photos) o.photos.clear(); done.remove(); form.classList.remove("is-sent");
           });
           form.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
         });
@@ -690,9 +723,7 @@
     });
     var wa = form.querySelector("[data-wa-send]");
     if (wa) wa.addEventListener("click", function () {
-      if (!form.reportValidity()) return;
-      // Mit Fotos: Teilen-Menü (WhatsApp-Links können keine Bilder mitnehmen)
-      if (shareWithPhotos()) return;
+      if (!check()) return;
       window.open("https://wa.me/" + C.whatsapp + "?text=" + encodeURIComponent(o.text()), "_blank", "noopener");
     });
   }
@@ -705,10 +736,9 @@
       setupForm(form, {
         subject: function () { return "Anfrage über Website: " + topic.value; },
         thanks: "Ihre Anfrage ist bei uns eingegangen. Wir melden uns schnellstmöglich bei Ihnen.",
-        check: function (say) {
-          var d = new FormData(form);
-          if (!d.get("phone") && !d.get("email")) { say("Bitte geben Sie Telefon oder E-Mail an, damit wir Ihnen antworten können.", true); return false; }
-          return true;
+        extra: function (mark) {
+          var ph = form.querySelector("[name=phone]"), em = form.querySelector("[name=email]");
+          if (!ph.value.trim() && !em.value.trim()) { mark(ph, "Telefon oder E-Mail angeben"); mark(em, "Telefon oder E-Mail angeben"); }
         },
         text: function () {
           var d = new FormData(form);
@@ -738,9 +768,7 @@
       });
       var photos = photoPicker(ank);
       canDirect().then(function (ok) {
-        if (!photos) return;
-        if (!ok && !canShareFiles) photos.disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen.");
-        else if (!ok) photos.note("Die Fotos werden beim Absenden über WhatsApp oder Mail mitgeschickt.");
+        if (photos && !ok) photos.disable("Foto-Versand ist hier noch nicht aktiv – Fotos bitte per WhatsApp schicken.");
       });
       setupForm(ank, {
         photos: photos,
