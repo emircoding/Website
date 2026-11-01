@@ -624,6 +624,102 @@
     };
   }
 
+  /* ---------- Auswahl-Menü „Womit möchten Sie senden?“ (Mail-App, Gmail, Outlook, WhatsApp) ---------- */
+  var UA = navigator.userAgent || "";
+  var isIOS = /iPad|iPhone|iPod/.test(UA) || (/Macintosh/.test(UA) && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/i.test(UA);
+  var SHEET_ICONS = {
+    mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg>',
+    gmail: '<b>G</b>', outlook: '<b>O</b>',
+    whatsapp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>'
+  };
+  var sheetEl = null, sheetMsg = null, sheetDone = null, lastFocus = null;
+  function sheetOptions() {
+    if (isIOS) return [
+      ["mail", "Mail", "iPhone-Mail oder Ihre Standard-App"], ["gmail", "Gmail", "Gmail-App"], ["outlook", "Outlook", "Outlook-App"],
+      ["whatsapp", "WhatsApp", "Nachricht an " + (C.phoneDisplay || "uns")], ["copy", "Text kopieren", "z. B. für GMX, WEB.DE oder andere"]];
+    if (isAndroid) return [
+      ["mail", "E-Mail-App wählen", "Gmail, Outlook, GMX, WEB.DE …"], ["whatsapp", "WhatsApp", "Nachricht an " + (C.phoneDisplay || "uns")],
+      ["copy", "Text kopieren", "für jede andere App"]];
+    return [
+      ["gmail", "Gmail", "öffnet sich im Browser"], ["outlook", "Outlook.com", "öffnet sich im Browser"],
+      ["mail", "Mail-Programm", "Outlook, Apple Mail, Thunderbird …"], ["whatsapp", "WhatsApp", "WhatsApp Web oder Desktop-App"],
+      ["copy", "Text kopieren", "z. B. für GMX, WEB.DE oder andere"]];
+  }
+  function buildSheet() {
+    sheetEl = document.createElement("div");
+    sheetEl.className = "sheet";
+    sheetEl.setAttribute("role", "dialog"); sheetEl.setAttribute("aria-modal", "true"); sheetEl.setAttribute("aria-labelledby", "sheet-title");
+    sheetEl.innerHTML = '<div class="sheet__bg" data-close></div><div class="sheet__panel"><span class="sheet__grip" aria-hidden="true"></span>' +
+      '<h3 id="sheet-title">Womit möchten Sie senden?</h3>' +
+      '<p class="sheet__sub">Ihre Nachricht an uns ist fertig vorbereitet – Sie müssen sie nur noch absenden.</p>' +
+      '<p class="sheet__tip" data-sheet-tip hidden>📎 Fotos Ihres Fahrzeugs können Sie in der E-Mail bzw. in WhatsApp direkt anhängen.</p>' +
+      '<div class="sheet__list">' + sheetOptions().map(function (o) {
+        return '<button type="button" class="sheet__opt" data-via="' + o[0] + '"><span class="sheet__ico sheet__ico--' + o[0] + '">' + SHEET_ICONS[o[0]] + "</span>" +
+          '<span class="sheet__txt"><b>' + o[1] + "</b><small>" + o[2] + '</small></span><svg class="sheet__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>';
+      }).join("") + "</div>" +
+      '<p class="sheet__copied" data-copied hidden></p>' +
+      '<button type="button" class="sheet__cancel" data-close>Abbrechen</button></div>';
+    document.body.appendChild(sheetEl);
+    sheetEl.addEventListener("click", function (e) {
+      if (e.target.closest("[data-close]")) return closeSheet();
+      var b = e.target.closest("[data-via]"); if (b) sendVia(b.getAttribute("data-via"));
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && sheetEl.classList.contains("is-open")) closeSheet(); });
+  }
+  function openSheet(msg, withPhotos, done) {
+    if (!sheetEl) buildSheet();
+    sheetMsg = msg; sheetDone = done; lastFocus = document.activeElement;
+    sheetEl.querySelector("[data-sheet-tip]").hidden = !withPhotos;
+    sheetEl.querySelector("[data-copied]").hidden = true;
+    document.body.classList.add("is-locked");
+    requestAnimationFrame(function () { sheetEl.classList.add("is-open"); var f = sheetEl.querySelector(".sheet__opt"); if (f) f.focus({ preventScroll: true }); });
+  }
+  function closeSheet() {
+    if (!sheetEl) return;
+    sheetEl.classList.remove("is-open");
+    document.body.classList.remove("is-locked");
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+  }
+  // App-Link versuchen (iPhone), sonst nach kurzer Zeit die Web-Version öffnen
+  function tryApp(appUrl, webUrl) {
+    var t = setTimeout(function () { if (!document.hidden) location.href = webUrl; }, 1600);
+    var stop = function () { clearTimeout(t); };
+    window.addEventListener("pagehide", stop, { once: true });
+    document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); }, { once: true });
+    location.href = appUrl;
+  }
+  function copyText(t) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t);
+    return new Promise(function (res, rej) {
+      var ta = document.createElement("textarea"); ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select(); try { document.execCommand("copy") ? res() : rej(); } catch (e) { rej(e); } ta.remove();
+    });
+  }
+  function sendVia(via) {
+    var m = sheetMsg, e = encodeURIComponent, to = C.email;
+    var mailto = "mailto:" + to + "?subject=" + e(m.subject) + "&body=" + e(m.body);
+    var gmailWeb = "https://mail.google.com/mail/?view=cm&fs=1&to=" + e(to) + "&su=" + e(m.subject) + "&body=" + e(m.body);
+    var outlookWeb = "https://outlook.live.com/mail/0/deeplink/compose?to=" + e(to) + "&subject=" + e(m.subject) + "&body=" + e(m.body);
+    var hint = "Ihre Nachricht ist vorbereitet – bitte in der App noch auf „Senden“ tippen.";
+    if (via === "copy") {
+      copyText("An: " + to + "\nBetreff: " + m.subject + "\n\n" + m.body).then(function () {
+        var c = sheetEl.querySelector("[data-copied]"); c.hidden = false;
+        c.textContent = "✓ Kopiert! Jetzt in Ihrer Mail-App eine neue E-Mail an " + to + " öffnen und den Text einfügen.";
+      }, function () {
+        var c = sheetEl.querySelector("[data-copied]"); c.hidden = false; c.textContent = "Kopieren nicht möglich – bitte eine andere Option wählen.";
+      });
+      return;
+    }
+    closeSheet();
+    if (via === "mail") location.href = mailto;
+    else if (via === "gmail") { if (isIOS) tryApp("googlegmail:///co?to=" + e(to) + "&subject=" + e(m.subject) + "&body=" + e(m.body), gmailWeb); else window.open(gmailWeb, "_blank", "noopener"); }
+    else if (via === "outlook") { if (isIOS) tryApp("ms-outlook://compose?to=" + e(to) + "&subject=" + e(m.subject) + "&body=" + e(m.body), outlookWeb); else window.open(outlookWeb, "_blank", "noopener"); }
+    else if (via === "whatsapp") { window.open("https://wa.me/" + C.whatsapp + "?text=" + e(m.body), "_blank", "noopener"); hint = "Ihre Nachricht ist vorbereitet – bitte in WhatsApp noch auf „Senden“ tippen."; }
+    if (sheetDone) sheetDone(hint);
+  }
+
   /* Pflichtfelder prüfen: fehlende/falsche Felder rot markieren, Hinweis darunter */
   function validate(form, extra) {
     var bad = [];
@@ -661,7 +757,7 @@
     form.querySelector(".form__actions").after(status);
     status.before(bar);
     var submit = form.querySelector("[type=submit]"), label = submit.innerHTML, sending = false;
-    function say(t, kind) { status.textContent = t; status.classList.toggle("is-error", kind === "err"); status.classList.toggle("is-busy", kind === "busy"); }
+    function say(t, kind) { status.textContent = t; status.classList.toggle("is-error", kind === "err"); status.classList.toggle("is-busy", kind === "busy"); status.classList.toggle("is-ok", kind === "ok"); }
     function busy(on) {
       sending = on; submit.disabled = on; submit.classList.toggle("is-loading", on);
       form.classList.toggle("is-sending", on);
@@ -686,6 +782,10 @@
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (sending || !check()) return;
+      if (C.formMode !== "server") {
+        openSheet(o.mail(), !!o.photoTip, function (hint) { say(hint, "ok"); });
+        return;
+      }
       if (o.photos && o.photos.busy()) { say("Bitte kurz warten – die Fotos werden noch vorbereitet …", "busy"); return; }
       busy(true);
       submit.innerHTML = "Wird gesendet …";
@@ -724,28 +824,41 @@
     var wa = form.querySelector("[data-wa-send]");
     if (wa) wa.addEventListener("click", function () {
       if (!check()) return;
-      window.open("https://wa.me/" + C.whatsapp + "?text=" + encodeURIComponent(o.text()), "_blank", "noopener");
+      window.open("https://wa.me/" + C.whatsapp + "?text=" + encodeURIComponent(o.mail().body), "_blank", "noopener");
+      say("Ihre Nachricht ist vorbereitet – bitte in WhatsApp noch auf „Senden“ tippen.", "ok");
     });
   }
 
   function forms() {
+    var server = C.formMode === "server";
+    // Elemente je nach Modus ein-/ausblenden (Foto-Upload nur mit Server)
+    document.querySelectorAll("[data-server-only]").forEach(function (el) { el.hidden = !server; });
+    document.querySelectorAll("[data-mail-only]").forEach(function (el) { el.hidden = server; });
+    var greet = "Hallo " + (C.name || "") + ",";
+    var sign = function (d) {
+      return ["", "Viele Grüße", d.get("name"), d.get("phone") ? "Telefon: " + d.get("phone") : "", d.get("email") ? "E-Mail: " + d.get("email") : ""].filter(function (x, i) { return i < 3 || x; });
+    };
+    var fmtNum = function (v, unit) {
+      var n = String(v || "").replace(/[.\s€]/g, "");
+      return /^\d+$/.test(n) ? new Intl.NumberFormat("de-DE").format(+n) + " " + unit : v;
+    };
+
     // Allgemeines Kontaktformular
     var form = document.querySelector("[data-contact-form]");
     if (form) {
       var topic = form.querySelector("[name=topic]");
       setupForm(form, {
-        subject: function () { return "Anfrage über Website: " + topic.value; },
         thanks: "Ihre Anfrage ist bei uns eingegangen. Wir melden uns schnellstmöglich bei Ihnen.",
         extra: function (mark) {
           var ph = form.querySelector("[name=phone]"), em = form.querySelector("[name=email]");
           if (!ph.value.trim() && !em.value.trim()) { mark(ph, "Telefon oder E-Mail angeben"); mark(em, "Telefon oder E-Mail angeben"); }
         },
-        text: function () {
+        mail: function () {
           var d = new FormData(form);
-          var lines = ["Anliegen: " + d.get("topic"), "Name: " + d.get("name"), "Telefon: " + (d.get("phone") || "–"), "E-Mail: " + (d.get("email") || "–")];
-          if (d.get("car")) lines.push("Fahrzeug: " + d.get("car"));
-          lines.push("", d.get("message") || "");
-          return lines.join("\n");
+          var body = [greet, "", d.get("message") || ""];
+          body.push("", "Anliegen: " + d.get("topic"));
+          if (d.get("car")) body.push("Fahrzeug: " + d.get("car"));
+          return { subject: d.get("topic") + " – Anfrage von " + d.get("name"), body: body.concat(sign(d)).join("\n") };
         }
       });
       var choose = function (v) {
@@ -758,7 +871,7 @@
       if (q) choose(q);
     }
 
-    // Ankauf-Formular: Fahrzeugdaten + Fotos → PDF per E-Mail
+    // Ankauf-Formular: Fahrzeugdaten (+ im Server-Modus Fotos → PDF)
     var ank = document.querySelector("[data-ankauf-form]");
     if (ank) {
       var reg = ank.querySelector("[data-reg]");
@@ -766,23 +879,27 @@
         var d = reg.value.replace(/\D/g, "").slice(0, 6);
         reg.value = d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
       });
-      var photos = photoPicker(ank);
-      canDirect().then(function (ok) {
-        if (photos && !ok) photos.disable("Foto-Versand ist hier noch nicht aktiv – Fotos bitte per WhatsApp schicken.");
+      var photos = server ? photoPicker(ank) : null;
+      if (photos) canDirect().then(function (ok) {
+        if (!ok) photos.disable("Foto-Versand ist hier noch nicht aktiv – Fotos bitte per WhatsApp schicken.");
       });
       setupForm(ank, {
         photos: photos,
+        photoTip: true,
         thanks: "Ihre Fahrzeugdaten und Fotos sind bei uns eingegangen. Wir melden uns schnellstmöglich mit einem Angebot.",
-        subject: function () { var d = new FormData(ank); return "Fahrzeugankauf: " + d.get("make") + " " + d.get("model"); },
-        text: function () {
+        mail: function () {
           var d = new FormData(ank);
-          var lines = ["Fahrzeugankauf – Bitte um Bewertung", ""];
-          [["make", "Marke"], ["model", "Modell"], ["type", "Fahrzeugtyp"], ["doors", "Anzahl der Türen"], ["reg", "Erstzulassung"], ["km", "Kilometerstand"], ["fuel", "Kraftstoffart"], ["gear", "Getriebe"], ["price", "Preis (Vorstellung)"]].forEach(function (f) {
-            lines.push(f[1] + ": " + (d.get(f[0]) || "–"));
+          var car = (d.get("make") + " " + d.get("model")).trim();
+          var body = [greet, "", "ich möchte mein Fahrzeug verkaufen und bitte um ein unverbindliches Angebot.", "", "MEIN FAHRZEUG"];
+          [["make", "Marke"], ["model", "Modell"], ["type", "Fahrzeugtyp"], ["doors", "Anzahl der Türen"], ["reg", "Erstzulassung"], ["km", "Kilometerstand"], ["fuel", "Kraftstoffart"], ["gear", "Getriebe"], ["price", "Preisvorstellung"]].forEach(function (f) {
+            var v = d.get(f[0]);
+            if (f[0] === "km") v = fmtNum(v, "km");
+            if (f[0] === "price") v = v ? fmtNum(v, "€") : "keine Angabe";
+            body.push(f[1] + ": " + (v || "–"));
           });
-          lines.push("", "Name: " + d.get("name"), "Telefon: " + d.get("phone"), "E-Mail: " + (d.get("email") || "–"));
-          if (d.get("message")) lines.push("", "Anmerkungen: " + d.get("message"));
-          return lines.join("\n");
+          if (d.get("message")) body.push("", "Anmerkungen: " + d.get("message"));
+          body.push("", "Fotos meines Fahrzeugs füge ich dieser Nachricht bei.");
+          return { subject: "Fahrzeugankauf: " + car + " – Angebot erbeten", body: body.concat(sign(d)).join("\n") };
         }
       });
     }

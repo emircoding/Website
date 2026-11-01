@@ -82,19 +82,17 @@ Falls mobile.de Ihnen im Händlerbereich einen anderen Einbindungs-Link nennt, d
 
 Auf der Startseite gibt es dazu einen animierten Teaser „Unser Bestand – live von mobile.de“, der auf die Fahrzeugseite führt.
 
-## 5. Formulare: direkt senden – Ankauf als PDF mit Fotos (PHP)
+## 5. Formulare (Einstellung `formMode` in config.js)
 
-Beide Formulare (Kontakt und Fahrzeugankauf) senden **direkt per E-Mail** – ohne dass beim Kunden ein Mail-Programm aufgeht:
-- **Kontakt:** E-Mail mit allen Angaben.
-- **Fahrzeugankauf:** E-Mail **mit PDF-Anhang** (alle Fahrzeugdaten, Kontakt, Anmerkungen und bis zu 10 Fotos). Im PDF ist jedes Foto anklickbar und öffnet eine eigene Seite in Großansicht. Zusätzlich hängen die Fotos einzeln als JPG an der E-Mail (zum Antippen, Zoomen, Speichern).
+**Aktuell: `formMode: "mail"`** – funktioniert überall, ohne Server.
+Beim Absenden öffnet sich ein Auswahl-Menü **„Womit möchten Sie senden?“**:
+- iPhone: Mail · Gmail-App · Outlook-App · WhatsApp · Text kopieren
+- Android: E-Mail-App wählen (Gmail, Outlook, GMX …) · WhatsApp · Text kopieren
+- Computer: Gmail (Browser) · Outlook.com (Browser) · Mail-Programm · WhatsApp · Text kopieren
 
-Empfänger ist die E-Mail-Adresse aus `assets/js/config.js`. Antworten gehen per „Antworten“ direkt an den Kunden.
-Fotos werden **nicht** auf dem Webspace gespeichert – sie gehen nur im PDF raus.
+In der gewählten App ist die E-Mail fertig vorbereitet (Empfänger, Betreff, freundlich formulierter Text mit allen Angaben). Fotos hängt der Kunde dort selbst an. Fehlende Pflichtfelder werden vorher rot markiert.
 
-Das läuft über **PHP** (Ordner `api/`, Datei `api/anfrage.php`) bei jedem gängigen Webhoster – einfach alle Dateien hochladen.
-**Tipp gegen Spam-Ordner:** Beim Hoster ein Postfach oder eine Weiterleitung `website@eure-domain.de` anlegen (oder in `api/_lib.php` bei `MAIL_FROM` eine Adresse eurer Domain eintragen). Der erste Test-Mail ggf. im Spam-Ordner „Kein Spam“ geben.
-
-Ohne PHP (lokal per Doppelklick oder auf pages.dev) öffnen die Formulare stattdessen das E-Mail-Programm, und Fotos werden per WhatsApp geschickt.
+**Später mit Webspace + PHP: `formMode: "server"`** – dann senden die Formulare direkt (ohne Mail-App), beim Ankauf mit Foto-Upload und PDF-Anhang (Ordner `api/`). Beim Umschalten bitte Bescheid geben, damit die Datenschutzerklärung angepasst wird.
 
 ## 6. Eigene Domain & Webhoster
 

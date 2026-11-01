@@ -41,6 +41,12 @@ window.AZN_CONFIG = {
   // Optional (nur für Profis): komplett eigene Einbettungs-Adresse statt der Standard-Adresse.
   mobileDeEmbed: "",
 
+  // ===== Formulare =====
+  // "mail"   = Absenden öffnet ein Auswahl-Menü (Mail-App, Gmail, Outlook, WhatsApp) mit fertiger E-Mail.
+  //            Fotos hängt der Kunde selbst in seiner Mail an. Funktioniert überall, ohne Server.
+  // "server" = direkter Versand über PHP (api/anfrage.php) inkl. Foto-Upload und PDF – nur mit Webspace + PHP.
+  formMode: "mail",
+
   // ===== Google-Bewertungen =====
   // Werte aus dem Google-Unternehmensprofil übernehmen. Solange rating 0 ist,
   // wird der Bewertungsbereich auf der Startseite ausgeblendet.

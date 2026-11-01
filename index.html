@@ -24,7 +24,7 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="assets/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/style.css?v=668a1f43">
+<link rel="stylesheet" href="assets/css/style.css?v=fdb77e54">
 </head>
 <body>
 <div class="preloader" aria-hidden="true"><div>
@@ -272,8 +272,8 @@
           <div class="field"><label for="a-fuel">Kraftstoffart *</label><select id="a-fuel" name="fuel" required><option value="">Bitte wählen</option><option>Benzin</option><option>Diesel</option><option>Hybrid (Benzin/Elektro)</option><option>Plug-in-Hybrid</option><option>Elektro</option><option>Autogas (LPG)</option><option>Erdgas (CNG)</option><option>Sonstige</option></select></div>
           <div class="field"><label for="a-gear">Getriebe *</label><select id="a-gear" name="gear" required><option value="">Bitte wählen</option><option>Schaltgetriebe</option><option>Automatik</option></select></div>
           <div class="field field--full"><label for="a-price">Preis</label><input id="a-price" name="price" placeholder="Ihre Preisvorstellung in €" inputmode="numeric"></div>
-        <p class="form__group">Fotos <span class="form__opt">(optional)</span></p>
-        <div class="uploader" data-uploader>
+        <p class="form__group" data-server-only hidden>Fotos <span class="form__opt">(optional)</span></p>
+        <div class="uploader" data-uploader data-server-only hidden>
           <label class="uploader__drop" for="a-photos" data-uploader-drop>
             <input class="sr-only" id="a-photos" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,image/*" multiple data-uploader-input>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h1.6l1.4-2h7l1.4 2h1.6A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="12.5" r="3.6"/><path d="M18 3v4M16 5h4"/></svg>
@@ -283,6 +283,7 @@
           <ul class="uploader__list" data-uploader-list></ul>
           <p class="uploader__note" data-uploader-note>Die Fotos werden beim Absenden zusammen mit Ihren Angaben als PDF an uns geschickt – nicht auf der Website gespeichert.</p>
         </div>
+        <p class="form__hint" data-mail-only>📎 <strong>Fotos?</strong> Die hängen Sie im nächsten Schritt einfach direkt an Ihre E-Mail an – am besten außen, innen, Tacho und eventuelle Schäden.</p>
         <p class="form__group">Ihre Kontaktdaten</p>
           <div class="field"><label for="a-name">Name *</label><input id="a-name" name="name" autocomplete="name" required></div>
           <div class="field"><label for="a-phone">Telefon *</label><input id="a-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required></div>
@@ -294,7 +295,7 @@
           <button class="btn" type="submit">Anfrage absenden <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           <button class="btn btn--ghost" type="button" data-wa-send><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg> Per WhatsApp</button>
         </div>
-        <p class="form__note">Mit dem Absenden werden Ihre Angaben und Fotos per E-Mail an uns übermittelt und nur zur Bearbeitung Ihrer Anfrage verwendet – mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
+        <p class="form__note">Beim Absenden wählen Sie Ihre E-Mail-App (oder WhatsApp) – die Nachricht an uns ist dort fertig vorbereitet. Ihre Angaben verwenden wir nur zur Bearbeitung Ihrer Anfrage, mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
       </form>
     </div>
   </section>
@@ -350,7 +351,7 @@
             <button class="btn" type="submit">Anfrage absenden <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
             <button class="btn btn--ghost" type="button" data-wa-send><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg> Per WhatsApp</button>
           </div>
-          <p class="form__note">Mit dem Absenden werden Ihre Angaben per E-Mail an uns übermittelt und nur zur Bearbeitung Ihrer Anfrage verwendet. Mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
+          <p class="form__note">Beim Absenden wählen Sie Ihre E-Mail-App (oder WhatsApp) – die Nachricht an uns ist dort fertig vorbereitet. Mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
         </form>
       </div>
     </div>
@@ -414,7 +415,7 @@
 </footer>
 <a class="fab" data-href="wa" href="#" target="_blank" rel="noopener" aria-label="WhatsApp schreiben"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg></a>
 
-<script src="assets/js/config.js?v=0ec20970"></script>
-<script src="assets/js/main.js?v=9e5b7891"></script>
+<script src="assets/js/config.js?v=3cd84134"></script>
+<script src="assets/js/main.js?v=bfaf175f"></script>
 </body>
 </html>
