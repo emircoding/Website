@@ -838,6 +838,39 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 .form--ankauf .field label { letter-spacing: .12em; }
 
+/* Foto-Upload (Ankauf) */
+.form__opt { font-weight: 400; letter-spacing: .1em; color: var(--mute); }
+.uploader { grid-column: 1 / -1; display: grid; gap: 12px; }
+.uploader__drop {
+  position: relative; display: grid; justify-items: center; gap: 6px; text-align: center; cursor: pointer;
+  padding: 26px 18px; border: 1.5px dashed rgba(11, 11, 12, .28); border-radius: 10px; background: var(--paper-2);
+  transition: border-color .3s, background .3s, transform .4s var(--ease);
+}
+.uploader__drop:hover, .uploader__drop.is-drag { border-color: var(--ink); background: #fff; }
+.uploader__drop.is-drag { transform: scale(1.01); }
+.uploader__drop:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.uploader__drop svg { width: 34px; height: 34px; margin-bottom: 4px; transition: transform .5s var(--ease); }
+.uploader__drop:hover svg { transform: translateY(-3px) rotate(-6deg); }
+.uploader__drop strong { font-family: var(--f-display); font-size: 16px; }
+.uploader__drop span { font-size: 13px; color: var(--mute); }
+.uploader__drop.is-full { pointer-events: none; opacity: .5; }
+.uploader.is-off .uploader__drop { pointer-events: none; opacity: .45; }
+.uploader__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.uploader__list:empty { display: none; }
+.up { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--paper); animation: fadeUp .4s var(--ease); }
+.up img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter .3s, opacity .3s; }
+.up--up img { filter: grayscale(1); opacity: .55; }
+.up--err img { filter: grayscale(1); opacity: .35; }
+.up__spin { position: absolute; inset: 0; margin: auto; width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid rgba(11, 11, 12, .2); border-top-color: var(--ink); animation: spinUp .8s linear infinite; }
+@keyframes spinUp { to { transform: rotate(360deg); } }
+.up__err { position: absolute; left: 4px; right: 4px; bottom: 4px; background: #b3261e; color: #fff; font-size: 10.5px; text-align: center; border-radius: 4px; padding: 2px 4px; }
+.up__x { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; background: rgba(11, 11, 12, .75); color: #fff; font-size: 17px; line-height: 1; display: grid; place-items: center; }
+.up__x:hover { background: var(--ink); }
+.up--ok::after { content: "✓"; position: absolute; left: 5px; top: 5px; width: 20px; height: 20px; border-radius: 50%; background: #1f9d55; color: #fff; font-size: 12px; display: grid; place-items: center; }
+.uploader__note { font-size: 12.5px; color: var(--mute); }
+.form__status { grid-column: 1 / -1; font-size: 14px; font-weight: 500; min-height: 1em; }
+.form__status:empty { display: none; }
+
 /* Google-Bewertungen */
 .rating { display: grid; gap: 8px; justify-items: start; }
 .rating__score { display: flex; align-items: center; gap: 16px; }

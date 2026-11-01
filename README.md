@@ -16,6 +16,7 @@ assets/css/style.css  Design & Animationen
 assets/img/           Logo, Icons, Vorschaubild
 assets/fonts/         Schriften (lokal → DSGVO-konform, kein Google Fonts)
 _headers              Sicherheits- & Cache-Einstellungen für Cloudflare
+functions/            Foto-Upload beim Ankauf (Cloudflare Pages Functions + KV-Speicher)
 ```
 
 ## 1. Auf den Windows-Laptop holen
@@ -79,6 +80,18 @@ Eingebunden wird die offizielle Händler-Einbindung von mobile.de:
 Falls mobile.de Ihnen im Händlerbereich einen anderen Einbindungs-Link nennt, diesen bei `mobileDeEmbed` in `config.js` eintragen.
 
 Auf der Startseite gibt es dazu einen animierten Teaser „Unser Bestand – live von mobile.de“, der auf die Fahrzeugseite führt.
+
+## 5. Foto-Upload beim Fahrzeugankauf einschalten (einmalig, ca. 2 Minuten)
+
+Im Ankauf-Formular können Kunden bis zu 10 Fotos hochladen. Die Fotos werden verkleinert, bei Cloudflare gespeichert und als **ein Link („Fotomappe“)** in die WhatsApp-/E-Mail-Nachricht eingefügt. Nach **60 Tagen** werden sie automatisch gelöscht. Kostenlos im Cloudflare-Gratis-Tarif.
+
+1. Cloudflare → **Storage & databases** → **KV** → **Create** → Name: `fotos` → anlegen.
+2. **Workers & Pages** → euer Projekt → **Settings** → **Bindings** → **Add** → **KV namespace**
+   - Variable name: `FOTOS` (genau so, Großbuchstaben)
+   - KV namespace: `fotos` auswählen → **Save**
+3. **Deployments** → beim obersten Eintrag **⋯ → Retry deployment**.
+
+Fertig. Solange das nicht eingerichtet ist, zeigt das Formular statt des Uploads den Hinweis, Fotos nach dem Absenden per WhatsApp zu schicken.
 
 ## Technik & Features
 

@@ -526,18 +526,114 @@
   }
 
   /* ---------- Formulare → E-Mail oder WhatsApp (es wird nichts an einen Server gesendet) ---------- */
-  function sendForm(form, subject, text) {
+  function sendForm(form, subject, text, before) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      if (!form.reportValidity()) return;
+      if (!form.reportValidity() || (before && !before())) return;
       location.href = "mailto:" + C.email + "?subject=" + encodeURIComponent(subject()) + "&body=" + encodeURIComponent(text());
     });
     var wa = form.querySelector("[data-wa-send]");
     if (wa) wa.addEventListener("click", function () {
-      if (!form.reportValidity()) return;
+      if (!form.reportValidity() || (before && !before())) return;
       window.open("https://wa.me/" + C.whatsapp + "?text=" + encodeURIComponent(text()), "_blank", "noopener");
     });
   }
+  /* ---------- Foto-Upload beim Ankauf ---------- */
+  function uploader(form) {
+    var box = form.querySelector("[data-uploader]");
+    if (!box) return null;
+    var input = box.querySelector("[data-uploader-input]"), list = box.querySelector("[data-uploader-list]");
+    var note = box.querySelector("[data-uploader-note]"), drop = box.querySelector("[data-uploader-drop]");
+    var MAX = 10, items = [], enabled = false, albumId = null, seq = 0;
+    var api = { pending: function () { return items.some(function (i) { return i.status === "up"; }); },
+      ready: function () { return items.filter(function (i) { return i.status === "ok"; }); } };
+
+    function rid() {
+      var a = new Uint8Array(18); (window.crypto || window.msCrypto).getRandomValues(a);
+      return btoa(String.fromCharCode.apply(null, a)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+    function disable(msg) {
+      enabled = false;
+      box.classList.add("is-off");
+      input.disabled = true;
+      note.textContent = msg;
+    }
+    // Ist der Upload eingerichtet? (lokal per Doppelklick bzw. ohne Cloudflare-Speicher: Hinweis statt Upload)
+    if (!/^https?:$/.test(location.protocol)) disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen.");
+    else fetch("/api/fotos", { headers: { Accept: "application/json" } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && j.enabled) enabled = true; else disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen."); })
+      .catch(function () { disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen."); });
+
+    // Bild verkleinern (max. 1600 px, JPEG) – spart Datenvolumen und entfernt Zusatzdaten wie GPS
+    function shrink(file) {
+      return new Promise(function (res) {
+        var url = URL.createObjectURL(file), img = new Image();
+        img.onload = function () {
+          var s = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+          var c = document.createElement("canvas");
+          c.width = Math.max(1, Math.round(img.naturalWidth * s)); c.height = Math.max(1, Math.round(img.naturalHeight * s));
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(function (b) { URL.revokeObjectURL(url); res(b || file); }, "image/jpeg", 0.82);
+        };
+        img.onerror = function () { URL.revokeObjectURL(url); res(file); };
+        img.src = url;
+      });
+    }
+    function render() {
+      list.innerHTML = items.map(function (it) {
+        return '<li class="up up--' + it.status + '" data-k="' + it.k + '"><img src="' + it.thumb + '" alt="">' +
+          (it.status === "up" ? '<span class="up__spin" aria-label="Wird hochgeladen"></span>' : "") +
+          (it.status === "err" ? '<span class="up__err">' + esc(it.err) + "</span>" : "") +
+          '<button type="button" class="up__x" aria-label="Foto entfernen" data-rm="' + it.k + '">×</button></li>';
+      }).join("");
+      drop.classList.toggle("is-full", items.length >= MAX);
+      var n = api.ready().length;
+      drop.querySelector("strong").textContent = items.length ? (items.length >= MAX ? "Maximal 10 Fotos" : "Weitere Fotos hinzufügen") : "Fotos hinzufügen";
+      form.dispatchEvent(new CustomEvent("azn:uploads", { detail: { ready: n, pending: api.pending() } }));
+    }
+    function add(files) {
+      if (!enabled) return;
+      Array.prototype.slice.call(files, 0, MAX - items.length).forEach(function (file) {
+        if (!/^image\//.test(file.type) && !/\.(jpe?g|png|webp|heic|heif)$/i.test(file.name)) return;
+        var it = { k: ++seq, status: "up", thumb: URL.createObjectURL(file) };
+        items.push(it);
+        shrink(file).then(function (blob) {
+          return fetch("/api/fotos", { method: "POST", body: blob, headers: { "Content-Type": blob.type || "application/octet-stream" } });
+        }).then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.id) throw new Error(j.error || "upload"); return j.id; });
+        }).then(function (id) {
+          it.id = id; it.status = "ok"; render();
+        }).catch(function (e) {
+          it.status = "err";
+          it.err = /unsupported/.test(e.message) ? "Format nicht unterstützt" : /too_large/.test(e.message) ? "Zu groß" : "Fehler";
+          render();
+        });
+      });
+      render();
+    }
+    input.addEventListener("change", function () { add(input.files); input.value = ""; });
+    list.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-rm]"); if (!b) return;
+      items = items.filter(function (i) { if (String(i.k) === b.getAttribute("data-rm")) { URL.revokeObjectURL(i.thumb); return false; } return true; });
+      render();
+    });
+    ["dragenter", "dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("is-drag"); }); });
+    ["dragleave", "drop"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("is-drag"); }); });
+    drop.addEventListener("drop", function (e) { if (e.dataTransfer && e.dataTransfer.files) add(e.dataTransfer.files); });
+
+    // Beim Absenden: Fotomappe speichern und Link liefern
+    api.link = function (title) {
+      var ok = api.ready();
+      if (!ok.length) return "";
+      if (!albumId) albumId = rid();
+      var body = JSON.stringify({ id: albumId, photos: ok.map(function (i) { return i.id; }), title: title });
+      try { fetch("/api/album", { method: "POST", body: body, headers: { "Content-Type": "application/json" }, keepalive: true }); } catch (e) { /* ok */ }
+      return location.origin + "/fotos/" + albumId;
+    };
+    return api;
+  }
+
   function forms() {
     // Allgemeines Kontaktformular
     var form = document.querySelector("[data-contact-form]");
@@ -568,6 +664,13 @@
         var d = reg.value.replace(/\D/g, "").slice(0, 6);
         reg.value = d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
       });
+      var up = uploader(ank), photoLink = "";
+      var status = document.createElement("p");
+      status.className = "form__status"; status.setAttribute("role", "status");
+      ank.querySelector(".form__actions").after(status);
+      ank.addEventListener("azn:uploads", function (e) {
+        status.textContent = e.detail.pending ? "Fotos werden hochgeladen …" : (e.detail.ready ? e.detail.ready + (e.detail.ready === 1 ? " Foto" : " Fotos") + " bereit – der Link kommt automatisch in Ihre Nachricht." : "");
+      });
       sendForm(ank, function () {
         var d = new FormData(ank);
         return "Fahrzeugankauf: " + d.get("make") + " " + d.get("model");
@@ -579,7 +682,14 @@
         });
         lines.push("", "Name: " + d.get("name"), "Telefon: " + d.get("phone"), "E-Mail: " + (d.get("email") || "–"));
         if (d.get("message")) lines.push("", "Anmerkungen: " + d.get("message"));
+        if (photoLink) lines.push("", "Fotos (" + up.ready().length + "): " + photoLink);
         return lines.join("\n");
+      }, function () {
+        // Vor dem Senden: warten, bis alle Fotos hochgeladen sind, dann Fotomappe anlegen
+        if (up && up.pending()) { status.textContent = "Bitte kurz warten – die Fotos werden noch hochgeladen …"; return false; }
+        var d = new FormData(ank);
+        photoLink = up ? up.link("Ankauf: " + d.get("make") + " " + d.get("model") + " – " + d.get("name")) : "";
+        return true;
       });
     }
   }
