@@ -525,96 +525,79 @@
     }).join("");
   }
 
-  /* ---------- Formulare → E-Mail oder WhatsApp (es wird nichts an einen Server gesendet) ---------- */
-  function sendForm(form, subject, text, before) {
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (!form.reportValidity() || (before && !before())) return;
-      location.href = "mailto:" + C.email + "?subject=" + encodeURIComponent(subject()) + "&body=" + encodeURIComponent(text());
-    });
-    var wa = form.querySelector("[data-wa-send]");
-    if (wa) wa.addEventListener("click", function () {
-      if (!form.reportValidity() || (before && !before())) return;
-      window.open("https://wa.me/" + C.whatsapp + "?text=" + encodeURIComponent(text()), "_blank", "noopener");
+  /* ---------- Formulare: direkt senden über PHP (api/anfrage.php) ----------
+     Ohne PHP (z. B. lokal oder auf pages.dev) öffnet sich stattdessen das E-Mail-Programm. */
+  var directP = null;
+  function canDirect() {
+    if (directP) return directP;
+    directP = !/^https?:$/.test(location.protocol) ? Promise.resolve(false)
+      : fetch("api/anfrage.php", { headers: { Accept: "application/json" } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { return !!(j && j.enabled); })
+        .catch(function () { return false; });
+    return directP;
+  }
+  function postForm(fd, onProgress) {
+    return new Promise(function (resolve) {
+      var x = new XMLHttpRequest();
+      x.open("POST", "api/anfrage.php");
+      x.timeout = 120000;
+      if (x.upload && onProgress) x.upload.onprogress = function (e) { if (e.lengthComputable) onProgress(e.loaded / e.total); };
+      x.onload = function () { var j = {}; try { j = JSON.parse(x.responseText); } catch (e) { /* ok */ } resolve({ ok: x.status === 200 && j.ok, status: x.status, data: j }); };
+      x.onerror = x.ontimeout = function () { resolve({ ok: false, status: 0, data: {} }); };
+      x.send(fd);
     });
   }
-  /* ---------- Foto-Upload beim Ankauf ---------- */
-  function uploader(form) {
+  function errorText(r) {
+    var e = r.data && r.data.error;
+    if (r.status === 413 || e === "too_large") return "Die Fotos sind zu groß – bitte weniger Fotos auswählen und erneut senden.";
+    if (e === "rate_limited") return "Zu viele Anfragen in kurzer Zeit – bitte später erneut versuchen oder uns anrufen.";
+    if (e === "missing" || e === "invalid") return "Bitte prüfen Sie Ihre Angaben (Pflichtfelder und E-Mail-Adresse).";
+    return "Das Senden hat leider nicht geklappt. Bitte per WhatsApp senden oder anrufen: " + (C.phoneDisplay || "");
+  }
+
+  /* Fotos beim Ankauf: werden im Browser verkleinert und beim Absenden mitgeschickt (im PDF) */
+  function photoPicker(form) {
     var box = form.querySelector("[data-uploader]");
     if (!box) return null;
     var input = box.querySelector("[data-uploader-input]"), list = box.querySelector("[data-uploader-list]");
     var note = box.querySelector("[data-uploader-note]"), drop = box.querySelector("[data-uploader-drop]");
-    var MAX = 10, items = [], enabled = false, albumId = null, seq = 0, be = null;
-    var api = { pending: function () { return items.some(function (i) { return i.status === "up"; }); },
-      ready: function () { return items.filter(function (i) { return i.status === "ok"; }); } };
-
-    function rid() {
-      var a = new Uint8Array(18); (window.crypto || window.msCrypto).getRandomValues(a);
-      return btoa(String.fromCharCode.apply(null, a)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-    }
-    function disable(msg) {
-      enabled = false;
-      box.classList.add("is-off");
-      input.disabled = true;
-      note.textContent = msg;
-    }
-    // Upload läuft über PHP (api/fotos.php) beim Webhoster.
-    // Ohne PHP (z. B. lokal per Doppelklick): Hinweis statt Upload.
-    var BACKENDS = [
-      { check: "api/fotos.php", upload: "api/fotos.php", album: "api/album.php", link: function (id) { return new URL("api/mappe.php?id=" + id, location.href).href; } }
-    ];
-    function probe(i) {
-      if (i >= BACKENDS.length) return disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen.");
-      fetch(BACKENDS[i].check, { headers: { Accept: "application/json" } })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (j) { if (j && j.enabled) { be = BACKENDS[i]; enabled = true; } else probe(i + 1); })
-        .catch(function () { probe(i + 1); });
-    }
-    if (/^https?:$/.test(location.protocol)) probe(0);
-    else disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen.");
-
-    // Bild verkleinern (max. 1600 px, JPEG) – spart Datenvolumen und entfernt Zusatzdaten wie GPS
-    function shrink(file) {
+    var MAX = 10, items = [], seq = 0, enabled = true;
+    function shrink(file, max, q) {
       return new Promise(function (res) {
         var url = URL.createObjectURL(file), img = new Image();
         img.onload = function () {
-          var s = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+          var s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
           var c = document.createElement("canvas");
           c.width = Math.max(1, Math.round(img.naturalWidth * s)); c.height = Math.max(1, Math.round(img.naturalHeight * s));
-          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-          c.toBlob(function (b) { URL.revokeObjectURL(url); res(b || file); }, "image/jpeg", 0.82);
+          var g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(function (b) { URL.revokeObjectURL(url); res(b); }, "image/jpeg", q);
         };
-        img.onerror = function () { URL.revokeObjectURL(url); res(file); };
+        img.onerror = function () { URL.revokeObjectURL(url); res(null); };
         img.src = url;
       });
     }
     function render() {
       list.innerHTML = items.map(function (it) {
-        return '<li class="up up--' + it.status + '" data-k="' + it.k + '"><img src="' + it.thumb + '" alt="">' +
-          (it.status === "up" ? '<span class="up__spin" aria-label="Wird hochgeladen"></span>' : "") +
+        return '<li class="up up--' + it.status + '">' + (it.thumb ? '<img src="' + it.thumb + '" alt="">' : "") +
+          (it.status === "up" ? '<span class="up__spin" aria-label="Wird vorbereitet"></span>' : "") +
           (it.status === "err" ? '<span class="up__err">' + esc(it.err) + "</span>" : "") +
           '<button type="button" class="up__x" aria-label="Foto entfernen" data-rm="' + it.k + '">×</button></li>';
       }).join("");
       drop.classList.toggle("is-full", items.length >= MAX);
-      var n = api.ready().length;
       drop.querySelector("strong").textContent = items.length ? (items.length >= MAX ? "Maximal 10 Fotos" : "Weitere Fotos hinzufügen") : "Fotos hinzufügen";
-      form.dispatchEvent(new CustomEvent("azn:uploads", { detail: { ready: n, pending: api.pending() } }));
     }
     function add(files) {
       if (!enabled) return;
       Array.prototype.slice.call(files, 0, MAX - items.length).forEach(function (file) {
-        if (!/^image\//.test(file.type) && !/\.(jpe?g|png|webp|heic|heif)$/i.test(file.name)) return;
-        var it = { k: ++seq, status: "up", thumb: URL.createObjectURL(file) };
+        var it = { k: ++seq, status: "up", thumb: "" };
         items.push(it);
-        shrink(file).then(function (blob) {
-          return fetch(be.upload, { method: "POST", body: blob, headers: { "Content-Type": blob.type || "application/octet-stream" } });
-        }).then(function (r) {
-          return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.id) throw new Error(j.error || "upload"); return j.id; });
-        }).then(function (id) {
-          it.id = id; it.status = "ok"; render();
-        }).catch(function (e) {
-          it.status = "err";
-          it.err = /unsupported/.test(e.message) ? "Format nicht unterstützt" : /too_large/.test(e.message) ? "Zu groß" : "Fehler";
+        shrink(file, 1400, 0.8).then(function (b) {
+          if (b && b.size > 1500000) return shrink(file, 1100, 0.72);
+          return b;
+        }).then(function (b) {
+          if (!b) { it.status = "err"; it.err = "Format nicht unterstützt"; }
+          else { it.blob = b; it.thumb = URL.createObjectURL(b); it.status = "ok"; }
           render();
         });
       });
@@ -623,23 +606,64 @@
     input.addEventListener("change", function () { add(input.files); input.value = ""; });
     list.addEventListener("click", function (e) {
       var b = e.target.closest("[data-rm]"); if (!b) return;
-      items = items.filter(function (i) { if (String(i.k) === b.getAttribute("data-rm")) { URL.revokeObjectURL(i.thumb); return false; } return true; });
+      items = items.filter(function (i) { if (String(i.k) === b.getAttribute("data-rm")) { if (i.thumb) URL.revokeObjectURL(i.thumb); return false; } return true; });
       render();
     });
     ["dragenter", "dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("is-drag"); }); });
     ["dragleave", "drop"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("is-drag"); }); });
     drop.addEventListener("drop", function (e) { if (e.dataTransfer && e.dataTransfer.files) add(e.dataTransfer.files); });
-
-    // Beim Absenden: Fotomappe speichern und Link liefern
-    api.link = function (title) {
-      var ok = api.ready();
-      if (!ok.length) return "";
-      if (!albumId) albumId = rid();
-      var body = JSON.stringify({ id: albumId, photos: ok.map(function (i) { return i.id; }), title: title });
-      try { fetch(be.album, { method: "POST", body: body, headers: { "Content-Type": "application/json" }, keepalive: true }); } catch (e) { /* ok */ }
-      return be.link(albumId);
+    return {
+      busy: function () { return items.some(function (i) { return i.status === "up"; }); },
+      blobs: function () { return items.filter(function (i) { return i.status === "ok"; }).map(function (i) { return i.blob; }); },
+      clear: function () { items.forEach(function (i) { if (i.thumb) URL.revokeObjectURL(i.thumb); }); items = []; render(); },
+      disable: function (msg) { enabled = false; box.classList.add("is-off"); input.disabled = true; note.textContent = msg; }
     };
-    return api;
+  }
+
+  /* Gemeinsamer Ablauf für beide Formulare */
+  function setupForm(form, o) {
+    var status = document.createElement("p");
+    status.className = "form__status"; status.setAttribute("role", "status");
+    form.querySelector(".form__actions").after(status);
+    var submit = form.querySelector("[type=submit]"), label = submit.innerHTML, sending = false;
+    function say(t, err) { status.textContent = t; status.classList.toggle("is-error", !!err); }
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (sending || !form.reportValidity()) return;
+      if (o.check && !o.check(say)) return;
+      canDirect().then(function (direct) {
+        if (!direct) { // Fallback: E-Mail-Programm öffnen
+          location.href = "mailto:" + C.email + "?subject=" + encodeURIComponent(o.subject()) + "&body=" + encodeURIComponent(o.text());
+          return;
+        }
+        if (o.photos && o.photos.busy()) { say("Bitte kurz warten – die Fotos werden noch vorbereitet …"); return; }
+        sending = true; submit.disabled = true; say("");
+        submit.innerHTML = "Wird gesendet …";
+        var fd = new FormData(form);
+        if (o.photos) o.photos.blobs().forEach(function (b, i) { fd.append("fotos[]", b, "foto-" + (i + 1) + ".jpg"); });
+        postForm(fd, function (p) { submit.textContent = "Wird gesendet … " + Math.round(p * 100) + " %"; }).then(function (r) {
+          sending = false; submit.disabled = false; submit.innerHTML = label;
+          if (!r.ok) { say(errorText(r), true); return; }
+          var name = (new FormData(form).get("name") || "").split(" ")[0];
+          var done = document.createElement("div");
+          done.className = "form__done";
+          done.innerHTML = '<svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg>' +
+            "<h3>Vielen Dank" + (name ? ", " + esc(name) : "") + "!</h3><p>" + esc(o.thanks) + "</p>" +
+            '<button type="button" class="btn btn--ghost">Neue Anfrage</button>';
+          form.classList.add("is-sent");
+          form.appendChild(done);
+          done.querySelector("button").addEventListener("click", function () {
+            form.reset(); if (o.photos) o.photos.clear(); say(""); done.remove(); form.classList.remove("is-sent");
+          });
+          form.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+        });
+      });
+    });
+    var wa = form.querySelector("[data-wa-send]");
+    if (wa) wa.addEventListener("click", function () {
+      if (!form.reportValidity()) return;
+      window.open("https://wa.me/" + C.whatsapp + "?text=" + encodeURIComponent(o.text()), "_blank", "noopener");
+    });
   }
 
   function forms() {
@@ -647,12 +671,21 @@
     var form = document.querySelector("[data-contact-form]");
     if (form) {
       var topic = form.querySelector("[name=topic]");
-      sendForm(form, function () { return "Anfrage über Website: " + topic.value; }, function () {
-        var d = new FormData(form);
-        var lines = ["Anliegen: " + d.get("topic"), "Name: " + d.get("name"), "Telefon: " + (d.get("phone") || "–"), "E-Mail: " + (d.get("email") || "–")];
-        if (d.get("car")) lines.push("Fahrzeug: " + d.get("car"));
-        lines.push("", d.get("message") || "");
-        return lines.join("\n");
+      setupForm(form, {
+        subject: function () { return "Anfrage über Website: " + topic.value; },
+        thanks: "Ihre Anfrage ist bei uns eingegangen. Wir melden uns schnellstmöglich bei Ihnen.",
+        check: function (say) {
+          var d = new FormData(form);
+          if (!d.get("phone") && !d.get("email")) { say("Bitte geben Sie Telefon oder E-Mail an, damit wir Ihnen antworten können.", true); return false; }
+          return true;
+        },
+        text: function () {
+          var d = new FormData(form);
+          var lines = ["Anliegen: " + d.get("topic"), "Name: " + d.get("name"), "Telefon: " + (d.get("phone") || "–"), "E-Mail: " + (d.get("email") || "–")];
+          if (d.get("car")) lines.push("Fahrzeug: " + d.get("car"));
+          lines.push("", d.get("message") || "");
+          return lines.join("\n");
+        }
       });
       var choose = function (v) {
         for (var i = 0; i < topic.options.length; i++) if (topic.options[i].value === v) { topic.value = v; return; }
@@ -664,7 +697,7 @@
       if (q) choose(q);
     }
 
-    // Ankauf-Formular: Fahrzeugdaten für die Bewertung
+    // Ankauf-Formular: Fahrzeugdaten + Fotos → PDF per E-Mail
     var ank = document.querySelector("[data-ankauf-form]");
     if (ank) {
       var reg = ank.querySelector("[data-reg]");
@@ -672,32 +705,22 @@
         var d = reg.value.replace(/\D/g, "").slice(0, 6);
         reg.value = d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
       });
-      var up = uploader(ank), photoLink = "";
-      var status = document.createElement("p");
-      status.className = "form__status"; status.setAttribute("role", "status");
-      ank.querySelector(".form__actions").after(status);
-      ank.addEventListener("azn:uploads", function (e) {
-        status.textContent = e.detail.pending ? "Fotos werden hochgeladen …" : (e.detail.ready ? e.detail.ready + (e.detail.ready === 1 ? " Foto" : " Fotos") + " bereit – der Link kommt automatisch in Ihre Nachricht." : "");
-      });
-      sendForm(ank, function () {
-        var d = new FormData(ank);
-        return "Fahrzeugankauf: " + d.get("make") + " " + d.get("model");
-      }, function () {
-        var d = new FormData(ank);
-        var lines = ["Fahrzeugankauf – Bitte um Bewertung", ""];
-        [["make", "Marke"], ["model", "Modell"], ["type", "Fahrzeugtyp"], ["doors", "Anzahl der Türen"], ["reg", "Erstzulassung"], ["km", "Kilometerstand"], ["fuel", "Kraftstoffart"], ["gear", "Getriebe"], ["price", "Preis (Vorstellung)"]].forEach(function (f) {
-          lines.push(f[1] + ": " + (d.get(f[0]) || "–"));
-        });
-        lines.push("", "Name: " + d.get("name"), "Telefon: " + d.get("phone"), "E-Mail: " + (d.get("email") || "–"));
-        if (d.get("message")) lines.push("", "Anmerkungen: " + d.get("message"));
-        if (photoLink) lines.push("", "Fotos (" + up.ready().length + "): " + photoLink);
-        return lines.join("\n");
-      }, function () {
-        // Vor dem Senden: warten, bis alle Fotos hochgeladen sind, dann Fotomappe anlegen
-        if (up && up.pending()) { status.textContent = "Bitte kurz warten – die Fotos werden noch hochgeladen …"; return false; }
-        var d = new FormData(ank);
-        photoLink = up ? up.link("Ankauf: " + d.get("make") + " " + d.get("model") + " – " + d.get("name")) : "";
-        return true;
+      var photos = photoPicker(ank);
+      canDirect().then(function (ok) { if (!ok && photos) photos.disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen."); });
+      setupForm(ank, {
+        photos: photos,
+        thanks: "Ihre Fahrzeugdaten und Fotos sind bei uns eingegangen. Wir melden uns schnellstmöglich mit einem Angebot.",
+        subject: function () { var d = new FormData(ank); return "Fahrzeugankauf: " + d.get("make") + " " + d.get("model"); },
+        text: function () {
+          var d = new FormData(ank);
+          var lines = ["Fahrzeugankauf – Bitte um Bewertung", ""];
+          [["make", "Marke"], ["model", "Modell"], ["type", "Fahrzeugtyp"], ["doors", "Anzahl der Türen"], ["reg", "Erstzulassung"], ["km", "Kilometerstand"], ["fuel", "Kraftstoffart"], ["gear", "Getriebe"], ["price", "Preis (Vorstellung)"]].forEach(function (f) {
+            lines.push(f[1] + ": " + (d.get(f[0]) || "–"));
+          });
+          lines.push("", "Name: " + d.get("name"), "Telefon: " + d.get("phone"), "E-Mail: " + (d.get("email") || "–"));
+          if (d.get("message")) lines.push("", "Anmerkungen: " + d.get("message"));
+          return lines.join("\n");
+        }
       });
     }
   }

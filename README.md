@@ -16,7 +16,7 @@ assets/css/style.css  Design & Animationen
 assets/img/           Logo, Icons, Vorschaubild
 assets/fonts/         Schriften (lokal → DSGVO-konform, kein Google Fonts)
 _headers              Sicherheits- & Cache-Einstellungen (nur Cloudflare Pages)
-api/                  Foto-Upload beim Ankauf (PHP)
+api/                  Formular-Versand per E-Mail + PDF beim Ankauf (PHP)
 .htaccess             Einstellungen für normale Webhoster (Apache)
 ```
 
@@ -82,14 +82,19 @@ Falls mobile.de Ihnen im Händlerbereich einen anderen Einbindungs-Link nennt, d
 
 Auf der Startseite gibt es dazu einen animierten Teaser „Unser Bestand – live von mobile.de“, der auf die Fahrzeugseite führt.
 
-## 5. Foto-Upload beim Fahrzeugankauf (PHP)
+## 5. Formulare: direkt senden – Ankauf als PDF mit Fotos (PHP)
 
-Im Ankauf-Formular können Kunden bis zu 10 Fotos hochladen. Die Fotos werden verkleinert, auf dem Webspace gespeichert und als **ein Link („Fotomappe“)** in die WhatsApp-/E-Mail-Nachricht eingefügt. Nach **60 Tagen** werden sie automatisch gelöscht.
+Beide Formulare (Kontakt und Fahrzeugankauf) senden **direkt per E-Mail** – ohne dass beim Kunden ein Mail-Programm aufgeht:
+- **Kontakt:** E-Mail mit allen Angaben.
+- **Fahrzeugankauf:** E-Mail **mit PDF-Anhang** (alle Fahrzeugdaten, Kontakt, Anmerkungen und bis zu 10 Fotos).
 
-Der Upload läuft über **PHP** (Ordner `api/`) – bei allen gängigen Webhostern (IONOS, Strato, All-Inkl, Hetzner …) ohne Einrichtung:
-einfach **alle Dateien per FTP hochladen** (inkl. Ordner `api/` und Datei `.htaccess`). Die Fotos liegen geschützt in `api/_daten/`. Voraussetzung: PHP 7 oder neuer.
+Empfänger ist die E-Mail-Adresse aus `assets/js/config.js`. Antworten gehen per „Antworten“ direkt an den Kunden.
+Fotos werden **nicht** auf dem Webspace gespeichert – sie gehen nur im PDF raus.
 
-Läuft die Seite ohne PHP (z. B. lokal per Doppelklick oder bei Cloudflare Pages), zeigt das Formular stattdessen den Hinweis, Fotos nach dem Absenden per WhatsApp zu schicken – alles andere funktioniert normal.
+Das läuft über **PHP** (Ordner `api/`, Datei `api/anfrage.php`) bei jedem gängigen Webhoster – einfach alle Dateien hochladen.
+**Tipp gegen Spam-Ordner:** Beim Hoster ein Postfach oder eine Weiterleitung `website@eure-domain.de` anlegen (oder in `api/_lib.php` bei `MAIL_FROM` eine Adresse eurer Domain eintragen). Der erste Test-Mail ggf. im Spam-Ordner „Kein Spam“ geben.
+
+Ohne PHP (lokal per Doppelklick oder auf pages.dev) öffnen die Formulare stattdessen das E-Mail-Programm, und Fotos werden per WhatsApp geschickt.
 
 ## 6. Eigene Domain & Webhoster
 

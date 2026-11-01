@@ -871,6 +871,23 @@ ul { margin: 0; padding: 0; list-style: none; }
 .form__status { grid-column: 1 / -1; font-size: 14px; font-weight: 500; min-height: 1em; }
 .form__status:empty { display: none; }
 
+/* Formular-Versand: Status, Erfolg, Spam-Falle */
+.hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+.form { position: relative; }
+.form__status.is-error { color: #b3261e; }
+.form.is-sent > :not(.form__done) { display: none !important; }
+.form__done {
+  grid-column: 1 / -1; min-height: 320px;
+  display: grid; place-content: center; justify-items: center; gap: 14px; text-align: center; padding: 24px 8px;
+  animation: fadeUp .6s var(--ease);
+}
+.form__done svg { width: 72px; height: 72px; fill: none; stroke: #1f9d55; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.form__done circle { stroke-dasharray: 160; stroke-dashoffset: 160; animation: draw 0.9s var(--ease) forwards; }
+.form__done path { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw .5s .6s var(--ease) forwards; }
+.form__done h3 { font-size: 28px; }
+.form__done p { color: var(--mute); max-width: 36ch; }
+.btn:disabled { opacity: .7; cursor: progress; }
+
 /* Google-Bewertungen */
 .rating { display: grid; gap: 8px; justify-items: start; }
 .rating__score { display: flex; align-items: center; gap: 16px; }

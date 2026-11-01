@@ -24,7 +24,7 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="assets/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/style.css?v=82eb4663">
+<link rel="stylesheet" href="assets/css/style.css?v=a46ca13d">
 </head>
 <body>
 <div class="preloader" aria-hidden="true"><div>
@@ -281,18 +281,20 @@
             <span>Bis zu 10 Bilder – z. B. außen, innen, Tacho und Schäden</span>
           </label>
           <ul class="uploader__list" data-uploader-list></ul>
-          <p class="uploader__note" data-uploader-note>Die Fotos werden sicher gespeichert, nur über den Link in Ihrer Nachricht abrufbar und nach 60 Tagen automatisch gelöscht.</p>
+          <p class="uploader__note" data-uploader-note>Die Fotos werden beim Absenden zusammen mit Ihren Angaben als PDF an uns geschickt – nicht auf der Website gespeichert.</p>
         </div>
         <p class="form__group">Ihre Kontaktdaten</p>
           <div class="field"><label for="a-name">Name *</label><input id="a-name" name="name" autocomplete="name" required></div>
           <div class="field"><label for="a-phone">Telefon *</label><input id="a-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required></div>
           <div class="field field--full"><label for="a-email">E-Mail</label><input id="a-email" name="email" type="email" autocomplete="email" inputmode="email"></div>
           <div class="field field--full"><label for="a-note">Anmerkungen (optional)</label><textarea id="a-note" name="message" rows="3" placeholder="z. B. Unfallfrei, Scheckheft, TÜV bis …"></textarea></div>
+        <input type="hidden" name="art" value="ankauf">
+        <div class="hp" aria-hidden="true"><label>Website <input name="website_url" tabindex="-1" autocomplete="off"></label></div>
         <div class="form__actions">
-          <button class="btn" type="button" data-wa-send><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg> Per WhatsApp senden</button>
-          <button class="btn btn--ghost" type="submit">Per E-Mail senden <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button class="btn" type="submit">Anfrage absenden <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button class="btn btn--ghost" type="button" data-wa-send><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg> Per WhatsApp</button>
         </div>
-        <p class="form__note">Ihre Angaben und Fotos verwenden wir nur zur Bearbeitung Ihrer Anfrage – mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
+        <p class="form__note">Mit dem Absenden werden Ihre Angaben und Fotos per E-Mail an uns übermittelt und nur zur Bearbeitung Ihrer Anfrage verwendet – mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
       </form>
     </div>
   </section>
@@ -342,11 +344,13 @@
           <div class="field field--full"><label for="email">E-Mail</label><input id="email" name="email" type="email" autocomplete="email" inputmode="email"></div>
           <div class="field field--full"><label for="car">Fahrzeug (optional)</label><input id="car" name="car" placeholder="z. B. BMW 320d aus Ihrem Bestand oder Ihr Wunschauto"></div>
           <div class="field field--full"><label for="message">Nachricht *</label><textarea id="message" name="message" required placeholder="Ihre Nachricht an uns"></textarea></div>
+          <input type="hidden" name="art" value="kontakt">
+          <div class="hp" aria-hidden="true"><label>Website <input name="website_url" tabindex="-1" autocomplete="off"></label></div>
           <div class="form__actions">
-            <button class="btn" type="submit">Per E-Mail senden <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+            <button class="btn" type="submit">Anfrage absenden <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
             <button class="btn btn--ghost" type="button" data-wa-send><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg> Per WhatsApp</button>
           </div>
-          <p class="form__note">Ihre Angaben werden nur zur Bearbeitung Ihrer Anfrage verwendet. Mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
+          <p class="form__note">Mit dem Absenden werden Ihre Angaben per E-Mail an uns übermittelt und nur zur Bearbeitung Ihrer Anfrage verwendet. Mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
         </form>
       </div>
     </div>
@@ -411,6 +415,6 @@
 <a class="fab" data-href="wa" href="#" target="_blank" rel="noopener" aria-label="WhatsApp schreiben"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg></a>
 
 <script src="assets/js/config.js?v=0ec20970"></script>
-<script src="assets/js/main.js?v=4a5a99dd"></script>
+<script src="assets/js/main.js?v=951f2038"></script>
 </body>
 </html>

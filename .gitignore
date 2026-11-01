@@ -4,7 +4,5 @@ desktop.ini
 node_modules/
 .wrangler/
 .dev.vars
-# Hochgeladene Fotos (PHP-Variante) nicht ins Repository
-api/_daten/fotos/
-api/_daten/alben/
-api/_daten/.cleanup
+# Laufzeitdaten der PHP-Formulare nicht ins Repository
+api/_daten/rl_*
