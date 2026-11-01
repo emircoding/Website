@@ -59,7 +59,9 @@
     var placeholders = /Muster|000 000|0000000/.test([C.owner, C.street, C.phone, C.phoneDisplay, C.whatsapp].join(" "));
     document.querySelectorAll("[data-placeholder-notice]").forEach(function (el) { el.hidden = !placeholders; });
     var maps = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.name + ", " + C.street + ", " + C.zip + " " + C.city);
-    var hrefs = { tel: "tel:" + C.phone, mail: "mailto:" + C.email, wa: "https://wa.me/" + C.whatsapp, maps: maps, mobilede: C.mobileDeUrl || mobileDeEmbedUrl() || "https://www.mobile.de/" };
+    var G = C.google || {};
+    var gprofile = G.profileUrl || maps;
+    var hrefs = { tel: "tel:" + C.phone, mail: "mailto:" + C.email, wa: "https://wa.me/" + C.whatsapp, maps: maps, mobilede: C.mobileDeUrl || mobileDeEmbedUrl() || "https://www.mobile.de/", gprofile: gprofile, greview: G.reviewUrl || gprofile };
     document.querySelectorAll("[data-href]").forEach(function (el) {
       var h = hrefs[el.getAttribute("data-href")];
       if (h) el.setAttribute("href", h);
@@ -493,14 +495,85 @@
     }
   }
 
+  /* ---------- Google-Bewertungen ---------- */
+  function esc(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function starsHTML(v) {
+    var out = "";
+    for (var i = 1; i <= 5; i++) {
+      var f = Math.max(0, Math.min(1, v - (i - 1)));
+      out += '<span class="star" style="--f:' + Math.round(f * 100) + '%"></span>';
+    }
+    return out;
+  }
+  function reviews() {
+    var sec = document.querySelector("[data-reviews]");
+    var G = C.google || {};
+    if (!sec || !(G.rating > 0)) return;
+    sec.hidden = false;
+    var nf = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    sec.querySelector("[data-rating-value]").textContent = nf.format(G.rating);
+    sec.querySelector("[data-rating-stars]").innerHTML = starsHTML(G.rating);
+    sec.querySelector("[data-rating-count]").textContent = new Intl.NumberFormat("de-DE").format(G.count || 0);
+    var list = (G.reviews || []).filter(function (r) { return r && r.text; });
+    var track = sec.querySelector("[data-reviews-track]");
+    if (!list.length) { track.remove(); return; }
+    track.innerHTML = list.map(function (r, i) {
+      return '<figure class="review" data-reveal style="--d:' + (i % 3) * 0.08 + 's">' +
+        '<div class="stars" role="img" aria-label="' + (r.stars || 5) + ' von 5 Sternen">' + starsHTML(r.stars || 5) + "</div>" +
+        "<blockquote>" + esc(r.text) + "</blockquote>" +
+        '<figcaption><span class="review__avatar" aria-hidden="true">' + esc((r.name || "?").charAt(0)) + "</span><span><b>" + esc(r.name || "Google-Nutzer") + "</b><small>" + esc(r.date || "") + (r.date ? " · " : "") + "Google</small></span></figcaption></figure>";
+    }).join("");
+  }
+
   /* ---------- Kontaktformular → E-Mail oder WhatsApp ---------- */
   function forms() {
     var form = document.querySelector("[data-contact-form]");
     if (!form) return;
+    var topic = form.querySelector("[name=topic]"), veh = form.querySelector("[data-vehicle]"), carField = form.querySelector("[data-carfield]");
+    var msg = form.querySelector("[name=message]");
+    var LABELS = {
+      Fahrzeugankauf: { legend: "Ihr Fahrzeug", reg: "Erstzulassung *", km: "Kilometerstand *", price: "Preisvorstellung (€)", hint: true, req: true },
+      Suchauftrag: { legend: "Ihr Wunschfahrzeug", reg: "Erstzulassung ab", km: "Kilometer bis", price: "Preis bis (€)", hint: false, req: false }
+    };
+    function sync() {
+      var L = LABELS[topic.value];
+      if (veh) {
+        veh.hidden = !L;
+        veh.querySelectorAll("[data-vreq]").forEach(function (inp) {
+          var always = inp.name === "make" || inp.name === "model";
+          inp.required = !!L && (L.req || always);
+        });
+        if (L) {
+          veh.querySelector("[data-vlegend]").textContent = L.legend;
+          veh.querySelector("[data-vlabel-reg]").textContent = L.reg;
+          veh.querySelector("[data-vlabel-km]").textContent = L.km;
+          veh.querySelector("[data-vlabel-price]").textContent = L.price;
+          veh.querySelector("[data-vhint]").hidden = !L.hint;
+        }
+      }
+      if (carField) carField.hidden = !!L;
+      // Bei Ankauf/Suchauftrag reichen die Fahrzeugdaten – die Nachricht ist dann optional
+      msg.required = !L;
+      msg.previousElementSibling.textContent = L ? "Nachricht (optional)" : "Nachricht *";
+    }
+    topic.addEventListener("change", sync);
+    // Erstzulassung automatisch als MM/JJJJ formatieren
+    var reg = form.querySelector("[name=reg]");
+    if (reg) reg.addEventListener("input", function () {
+      var d = reg.value.replace(/\D/g, "").slice(0, 6);
+      reg.value = d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
+    });
     function text() {
-      var d = new FormData(form);
-      return "Anliegen: " + d.get("topic") + "\nName: " + d.get("name") + "\nTelefon: " + (d.get("phone") || "–") + "\nE-Mail: " + (d.get("email") || "–") +
-        (d.get("car") ? "\nFahrzeug: " + d.get("car") : "") + "\n\n" + (d.get("message") || "");
+      var d = new FormData(form), L = LABELS[d.get("topic")];
+      var lines = ["Anliegen: " + d.get("topic"), "Name: " + d.get("name"), "Telefon: " + (d.get("phone") || "–"), "E-Mail: " + (d.get("email") || "–")];
+      if (L) {
+        lines.push("", L.legend + ":");
+        [["make", "Marke"], ["model", "Modell"], ["type", "Fahrzeugtyp"], ["doors", "Türen"], ["reg", L.reg.replace(" *", "")], ["km", L.km.replace(" *", "")], ["fuel", "Kraftstoff"], ["gear", "Getriebe"], ["price", L.price]].forEach(function (f) {
+          var v = d.get(f[0]); if (v) lines.push("- " + f[1] + ": " + v);
+        });
+      } else if (d.get("car")) lines.push("Fahrzeug: " + d.get("car"));
+      if (d.get("message")) lines.push("", d.get("message"));
+      return lines.join("\n");
     }
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -513,18 +586,23 @@
       if (!form.reportValidity()) return;
       window.open("https://wa.me/" + C.whatsapp + "?text=" + encodeURIComponent(text()), "_blank", "noopener");
     });
-    // Links wie „Fahrzeug bewerten lassen“ wählen das passende Anliegen vor
+    function choose(v) {
+      for (var i = 0; i < topic.options.length; i++) if (topic.options[i].value === v) { topic.value = v; sync(); return; }
+    }
+    // Links wie „Auto bewerten lassen“ wählen das passende Anliegen vor
     document.querySelectorAll("[data-topic]").forEach(function (a) {
-      a.addEventListener("click", function () {
-        var sel = form.querySelector("[name=topic]");
-        if (sel) sel.value = a.getAttribute("data-topic");
-      });
+      a.addEventListener("click", function () { choose(a.getAttribute("data-topic")); });
     });
+    // …auch von anderen Seiten aus (z. B. index.html?anliegen=Suchauftrag#kontakt)
+    var q = new URLSearchParams(location.search).get("anliegen");
+    if (q) choose(q);
+    sync();
   }
 
   /* ---------- Start ---------- */
   document.addEventListener("DOMContentLoaded", function () {
     applyConfig();
+    reviews();
     consent.init();
     mobileDeEmbed();
     splitHeadings();

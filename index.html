@@ -24,7 +24,7 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="assets/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/style.css?v=6135317a">
+<link rel="stylesheet" href="assets/css/style.css?v=cd359006">
 </head>
 <body>
 <div class="preloader" aria-hidden="true"><div>
@@ -299,6 +299,27 @@
     </div>
   </section>
 
+  <section class="section reviews" id="bewertungen" data-reviews hidden>
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <span class="eyebrow" data-reveal>Bewertungen</span>
+          <h2 class="section__title" data-split>Das sagen<br><em>unsere Kunden.</em></h2>
+        </div>
+        <div class="rating" data-reveal>
+          <div class="rating__score"><span data-rating-value>0,0</span><div class="stars stars--lg" data-rating-stars aria-hidden="true"></div></div>
+          <p class="rating__count"><span data-rating-count>0</span> Bewertungen auf Google</p>
+          <div class="rating__links">
+            <a class="link-arrow" data-href="gprofile" href="#" target="_blank" rel="noopener">Alle auf Google <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
+            <a class="link-arrow" data-href="greview" href="#" target="_blank" rel="noopener">Bewertung schreiben <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="reviews__track" data-reviews-track></div>
+      <p class="reviews__note">Ausgewählte Bewertungen aus unserem Google-Unternehmensprofil. Die Gesamtbewertung und Anzahl umfassen alle Bewertungen auf Google. Wir prüfen nicht selbst, ob die Bewertenden unsere Leistungen in Anspruch genommen haben; Google setzt hierfür eigene Prüfverfahren ein.</p>
+    </div>
+  </section>
+
   <section class="section section--white" id="kontakt">
     <div class="container">
       <div class="section__head">
@@ -317,12 +338,25 @@
         <form class="form" data-contact-form data-reveal novalidate>
           <h3>Anfrage senden</h3>
           <div class="field field--full"><label for="topic">Anliegen</label>
-            <select id="topic" name="topic"><option>Fahrzeugkauf</option><option>Probefahrt</option><option>Fahrzeugankauf</option><option>Finanzierung</option><option>Sonstiges</option></select></div>
+            <select id="topic" name="topic"><option>Fahrzeugkauf</option><option>Probefahrt</option><option>Fahrzeugankauf</option><option>Suchauftrag</option><option>Finanzierung</option><option>Sonstiges</option></select></div>
           <div class="field"><label for="name">Name *</label><input id="name" name="name" autocomplete="name" required></div>
           <div class="field"><label for="phone">Telefon</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel"></div>
           <div class="field field--full"><label for="email">E-Mail</label><input id="email" name="email" type="email" autocomplete="email" inputmode="email"></div>
-          <div class="field field--full"><label for="car">Fahrzeug (optional)</label><input id="car" name="car" placeholder="z. B. VW Golf, Bj. 2018, 90.000 km"></div>
-          <div class="field field--full"><label for="message">Nachricht *</label><textarea id="message" name="message" required></textarea></div>
+          <fieldset class="vehicle" data-vehicle hidden>
+            <legend data-vlegend>Ihr Fahrzeug</legend>
+            <div class="field"><label for="v-make">Marke *</label><input id="v-make" name="make" placeholder="z. B. VW" data-vreq></div>
+            <div class="field"><label for="v-model">Modell *</label><input id="v-model" name="model" placeholder="z. B. Golf" data-vreq></div>
+            <div class="field"><label for="v-type">Fahrzeugtyp</label><select id="v-type" name="type"><option value="">Bitte wählen</option><option>Limousine</option><option>Kombi</option><option>SUV / Geländewagen</option><option>Kleinwagen</option><option>Cabrio / Roadster</option><option>Sportwagen / Coupé</option><option>Van / Kleinbus</option><option>Transporter</option><option>Sonstiges</option></select></div>
+            <div class="field"><label for="v-doors">Türen</label><select id="v-doors" name="doors"><option value="">Bitte wählen</option><option>2/3</option><option>4/5</option><option>6/7</option></select></div>
+            <div class="field"><label for="v-reg" data-vlabel-reg>Erstzulassung *</label><input id="v-reg" name="reg" placeholder="MM/JJJJ" inputmode="numeric" maxlength="7" data-vreq></div>
+            <div class="field"><label for="v-km" data-vlabel-km>Kilometerstand *</label><input id="v-km" name="km" placeholder="z. B. 85.000" inputmode="numeric" data-vreq></div>
+            <div class="field"><label for="v-fuel">Kraftstoffart</label><select id="v-fuel" name="fuel"><option value="">Bitte wählen</option><option>Benzin</option><option>Diesel</option><option>Hybrid (Benzin/Elektro)</option><option>Plug-in-Hybrid</option><option>Elektro</option><option>Autogas (LPG)</option><option>Erdgas (CNG)</option><option>Sonstige</option></select></div>
+            <div class="field"><label for="v-gear">Getriebe</label><select id="v-gear" name="gear"><option value="">Bitte wählen</option><option>Schaltgetriebe</option><option>Automatik</option></select></div>
+            <div class="field field--full"><label for="v-price" data-vlabel-price>Preisvorstellung (€)</label><input id="v-price" name="price" placeholder="z. B. 12.500" inputmode="numeric"></div>
+            <p class="vehicle__hint" data-vhint>Tipp: Fotos Ihres Fahrzeugs können Sie uns anschließend direkt per WhatsApp schicken.</p>
+          </fieldset>
+          <div class="field field--full" data-carfield><label for="car">Fahrzeug / Inserat (optional)</label><input id="car" name="car" placeholder="z. B. BMW 320d aus Ihrem Bestand"></div>
+          <div class="field field--full"><label for="message">Nachricht *</label><textarea id="message" name="message" required placeholder="Ihre Nachricht an uns"></textarea></div>
           <div class="form__actions">
             <button class="btn" type="submit">Per E-Mail senden <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
             <button class="btn btn--ghost" type="button" data-wa-send><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg> Per WhatsApp</button>
@@ -391,7 +425,7 @@
 </footer>
 <a class="fab" data-href="wa" href="#" target="_blank" rel="noopener" aria-label="WhatsApp schreiben"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg></a>
 
-<script src="assets/js/config.js?v=97964401"></script>
-<script src="assets/js/main.js?v=566095d0"></script>
+<script src="assets/js/config.js?v=eac2b425"></script>
+<script src="assets/js/main.js?v=0e568762"></script>
 </body>
 </html>
