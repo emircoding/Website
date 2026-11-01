@@ -1,0 +1,37 @@
+# ==========================================================================
+# Einstellungen für normale Webhoster mit Apache (IONOS, Strato, All-Inkl …)
+# Bei Cloudflare Pages wird diese Datei nicht benötigt (dort gilt _headers).
+# ==========================================================================
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  <FilesMatch "\.(woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(css|js|html)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Optional: immer HTTPS – erst einschalten, wenn das SSL-Zertifikat beim Hoster aktiv ist
+  # RewriteCond %{HTTPS} !=on
+  # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Kurze Adressen wie bei Cloudflare: /fahrzeuge → fahrzeuge.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^(.+?)/?$ $1.html [L]
+
+  # Interne Ordner/Dateien nicht ausliefern
+  RewriteRule ^(functions|\.wrangler)(/|$) - [R=404,L]
+  RewriteRule ^(README\.md|_headers|\.gitignore)$ - [R=404,L]
+</IfModule>

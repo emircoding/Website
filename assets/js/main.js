@@ -544,7 +544,7 @@
     if (!box) return null;
     var input = box.querySelector("[data-uploader-input]"), list = box.querySelector("[data-uploader-list]");
     var note = box.querySelector("[data-uploader-note]"), drop = box.querySelector("[data-uploader-drop]");
-    var MAX = 10, items = [], enabled = false, albumId = null, seq = 0;
+    var MAX = 10, items = [], enabled = false, albumId = null, seq = 0, be = null;
     var api = { pending: function () { return items.some(function (i) { return i.status === "up"; }); },
       ready: function () { return items.filter(function (i) { return i.status === "ok"; }); } };
 
@@ -558,12 +558,21 @@
       input.disabled = true;
       note.textContent = msg;
     }
-    // Ist der Upload eingerichtet? (lokal per Doppelklick bzw. ohne Cloudflare-Speicher: Hinweis statt Upload)
-    if (!/^https?:$/.test(location.protocol)) disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen.");
-    else fetch("/api/fotos", { headers: { Accept: "application/json" } })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { if (j && j.enabled) enabled = true; else disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen."); })
-      .catch(function () { disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen."); });
+    // Wo läuft die Seite? Cloudflare (Pages Functions) oder normaler Webhoster (PHP)?
+    // Wird beides nicht gefunden (z. B. lokal per Doppelklick): Hinweis statt Upload.
+    var BACKENDS = [
+      { check: "/api/fotos", upload: "/api/fotos", album: "/api/album", link: function (id) { return location.origin + "/fotos/" + id; } },
+      { check: "api/fotos.php", upload: "api/fotos.php", album: "api/album.php", link: function (id) { return new URL("api/mappe.php?id=" + id, location.href).href; } }
+    ];
+    function probe(i) {
+      if (i >= BACKENDS.length) return disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen.");
+      fetch(BACKENDS[i].check, { headers: { Accept: "application/json" } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { if (j && j.enabled) { be = BACKENDS[i]; enabled = true; } else probe(i + 1); })
+        .catch(function () { probe(i + 1); });
+    }
+    if (/^https?:$/.test(location.protocol)) probe(0);
+    else disable("Fotos können Sie nach dem Absenden direkt in WhatsApp anhängen.");
 
     // Bild verkleinern (max. 1600 px, JPEG) – spart Datenvolumen und entfernt Zusatzdaten wie GPS
     function shrink(file) {
@@ -599,7 +608,7 @@
         var it = { k: ++seq, status: "up", thumb: URL.createObjectURL(file) };
         items.push(it);
         shrink(file).then(function (blob) {
-          return fetch("/api/fotos", { method: "POST", body: blob, headers: { "Content-Type": blob.type || "application/octet-stream" } });
+          return fetch(be.upload, { method: "POST", body: blob, headers: { "Content-Type": blob.type || "application/octet-stream" } });
         }).then(function (r) {
           return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.id) throw new Error(j.error || "upload"); return j.id; });
         }).then(function (id) {
@@ -628,8 +637,8 @@
       if (!ok.length) return "";
       if (!albumId) albumId = rid();
       var body = JSON.stringify({ id: albumId, photos: ok.map(function (i) { return i.id; }), title: title });
-      try { fetch("/api/album", { method: "POST", body: body, headers: { "Content-Type": "application/json" }, keepalive: true }); } catch (e) { /* ok */ }
-      return location.origin + "/fotos/" + albumId;
+      try { fetch(be.album, { method: "POST", body: body, headers: { "Content-Type": "application/json" }, keepalive: true }); } catch (e) { /* ok */ }
+      return be.link(albumId);
     };
     return api;
   }
