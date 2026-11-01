@@ -1,6 +1,5 @@
 # ==========================================================================
 # Einstellungen für normale Webhoster mit Apache (IONOS, Strato, All-Inkl …)
-# Bei Cloudflare Pages wird diese Datei nicht benötigt (dort gilt _headers).
 # ==========================================================================
 DirectoryIndex index.html
 ErrorDocument 404 /404.html
@@ -32,6 +31,5 @@ Options -Indexes
   RewriteRule ^(.+?)/?$ $1.html [L]
 
   # Interne Ordner/Dateien nicht ausliefern
-  RewriteRule ^(functions|\.wrangler)(/|$) - [R=404,L]
   RewriteRule ^(README\.md|_headers|\.gitignore)$ - [R=404,L]
 </IfModule>

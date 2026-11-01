@@ -558,10 +558,9 @@
       input.disabled = true;
       note.textContent = msg;
     }
-    // Wo läuft die Seite? Cloudflare (Pages Functions) oder normaler Webhoster (PHP)?
-    // Wird beides nicht gefunden (z. B. lokal per Doppelklick): Hinweis statt Upload.
+    // Upload läuft über PHP (api/fotos.php) beim Webhoster.
+    // Ohne PHP (z. B. lokal per Doppelklick): Hinweis statt Upload.
     var BACKENDS = [
-      { check: "/api/fotos", upload: "/api/fotos", album: "/api/album", link: function (id) { return location.origin + "/fotos/" + id; } },
       { check: "api/fotos.php", upload: "api/fotos.php", album: "api/album.php", link: function (id) { return new URL("api/mappe.php?id=" + id, location.href).href; } }
     ];
     function probe(i) {

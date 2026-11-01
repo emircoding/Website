@@ -15,9 +15,8 @@ assets/js/config.js   ★ FIRMENDATEN (Adresse, Telefon, WhatsApp, Öffnungszeit
 assets/css/style.css  Design & Animationen
 assets/img/           Logo, Icons, Vorschaubild
 assets/fonts/         Schriften (lokal → DSGVO-konform, kein Google Fonts)
-_headers              Sicherheits- & Cache-Einstellungen für Cloudflare
-functions/            Foto-Upload beim Ankauf – Variante Cloudflare (Pages Functions + KV)
-api/                  Foto-Upload beim Ankauf – Variante normaler Webhoster (PHP)
+_headers              Sicherheits- & Cache-Einstellungen (nur Cloudflare Pages)
+api/                  Foto-Upload beim Ankauf (PHP)
 .htaccess             Einstellungen für normale Webhoster (Apache)
 ```
 
@@ -83,28 +82,23 @@ Falls mobile.de Ihnen im Händlerbereich einen anderen Einbindungs-Link nennt, d
 
 Auf der Startseite gibt es dazu einen animierten Teaser „Unser Bestand – live von mobile.de“, der auf die Fahrzeugseite führt.
 
-## 5. Foto-Upload beim Fahrzeugankauf
+## 5. Foto-Upload beim Fahrzeugankauf (PHP)
 
-Im Ankauf-Formular können Kunden bis zu 10 Fotos hochladen. Die Fotos werden verkleinert, gespeichert und als **ein Link („Fotomappe“)** in die WhatsApp-/E-Mail-Nachricht eingefügt. Nach **60 Tagen** werden sie automatisch gelöscht.
-Die Seite erkennt selbst, wo sie läuft – es gibt zwei gleichwertige Varianten:
+Im Ankauf-Formular können Kunden bis zu 10 Fotos hochladen. Die Fotos werden verkleinert, auf dem Webspace gespeichert und als **ein Link („Fotomappe“)** in die WhatsApp-/E-Mail-Nachricht eingefügt. Nach **60 Tagen** werden sie automatisch gelöscht.
 
-**A) Bei Cloudflare Pages** (einmalig einrichten, ca. 2 Minuten, kostenlos)
-1. Cloudflare → **Storage & databases** → **KV** → **Create** → Name: `fotos` → anlegen.
-2. **Workers & Pages** → euer Projekt → **Settings** → **Bindings** → **Add** → **KV namespace** → Variable name `FOTOS`, Namespace `fotos` → **Save**.
-3. **Deployments** → oberster Eintrag **⋯ → Retry deployment**.
+Der Upload läuft über **PHP** (Ordner `api/`) – bei allen gängigen Webhostern (IONOS, Strato, All-Inkl, Hetzner …) ohne Einrichtung:
+einfach **alle Dateien per FTP hochladen** (inkl. Ordner `api/` und Datei `.htaccess`). Die Fotos liegen geschützt in `api/_daten/`. Voraussetzung: PHP 7 oder neuer.
 
-**B) Bei einem normalen Webhoster mit PHP** (IONOS, Strato, All-Inkl, Hetzner …)
-Nichts einrichten – einfach **alle Dateien per FTP hochladen** (inkl. Ordner `api/` und der Datei `.htaccess`). Der Upload läuft dann über `api/fotos.php`; die Fotos liegen geschützt in `api/_daten/`. Voraussetzung: PHP 7 oder neuer (bei allen gängigen Hostern Standard).
+Läuft die Seite ohne PHP (z. B. lokal per Doppelklick oder bei Cloudflare Pages), zeigt das Formular stattdessen den Hinweis, Fotos nach dem Absenden per WhatsApp zu schicken – alles andere funktioniert normal.
 
-Läuft keins von beiden (z. B. lokal per Doppelklick), zeigt das Formular den Hinweis, Fotos nach dem Absenden per WhatsApp zu schicken.
+## 6. Eigene Domain & Webhoster
 
-## 6. Eigene Domain (z. B. automobilzentrum-nagold.de)
+1. Webhosting-Paket mit PHP bei einem Anbieter buchen (Domain meist inklusive).
+2. Alle Dateien per FTP in das Hauptverzeichnis der Domain hochladen.
+3. Beim Hoster das kostenlose SSL-Zertifikat (HTTPS) aktivieren; danach in `.htaccess` die zwei Zeilen „immer HTTPS“ aktivieren (Raute entfernen).
+4. In der **Datenschutzerklärung Abschnitt 3 (Hosting)** den neuen Anbieter statt Cloudflare eintragen (Bescheid geben, dann wird es angepasst).
 
-Zwei Möglichkeiten – die Website funktioniert bei beiden vollständig:
-
-- **Bei Cloudflare bleiben (empfohlen, kostenlos):** Domain bei einem beliebigen Anbieter kaufen, dann in Cloudflare → Projekt → **Custom domains** → **Set up a domain**. Alles läuft weiter wie bisher.
-- **Zu einem normalen Webhoster umziehen:** Alle Dateien per FTP in das Hauptverzeichnis der Domain hochladen (siehe 5B). `.htaccess` sorgt für Fehlerseite, Sicherheits-Header und kurze Adressen. HTTPS beim Hoster aktivieren.
-  Danach in der **Datenschutzerklärung Abschnitt 3 (Hosting)** den neuen Anbieter statt Cloudflare eintragen (Vorlage: `datenschutz.html` bzw. Bescheid geben).
+`.htaccess` sorgt für Fehlerseite, Sicherheits-Header und kurze Adressen (`/fahrzeuge`). Die Datei `_headers` wird nur bei Cloudflare Pages genutzt und kann sonst ignoriert werden.
 
 ## Technik & Features
 
