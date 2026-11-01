@@ -525,78 +525,63 @@
     }).join("");
   }
 
-  /* ---------- Kontaktformular → E-Mail oder WhatsApp ---------- */
-  function forms() {
-    var form = document.querySelector("[data-contact-form]");
-    if (!form) return;
-    var topic = form.querySelector("[name=topic]"), veh = form.querySelector("[data-vehicle]"), carField = form.querySelector("[data-carfield]");
-    var msg = form.querySelector("[name=message]");
-    var LABELS = {
-      Fahrzeugankauf: { legend: "Ihr Fahrzeug", reg: "Erstzulassung *", km: "Kilometerstand *", price: "Preisvorstellung (€)", hint: true, req: true },
-      Suchauftrag: { legend: "Ihr Wunschfahrzeug", reg: "Erstzulassung ab", km: "Kilometer bis", price: "Preis bis (€)", hint: false, req: false }
-    };
-    function sync() {
-      var L = LABELS[topic.value];
-      if (veh) {
-        veh.hidden = !L;
-        veh.querySelectorAll("[data-vreq]").forEach(function (inp) {
-          var always = inp.name === "make" || inp.name === "model";
-          inp.required = !!L && (L.req || always);
-        });
-        if (L) {
-          veh.querySelector("[data-vlegend]").textContent = L.legend;
-          veh.querySelector("[data-vlabel-reg]").textContent = L.reg;
-          veh.querySelector("[data-vlabel-km]").textContent = L.km;
-          veh.querySelector("[data-vlabel-price]").textContent = L.price;
-          veh.querySelector("[data-vhint]").hidden = !L.hint;
-        }
-      }
-      if (carField) carField.hidden = !!L;
-      // Bei Ankauf/Suchauftrag reichen die Fahrzeugdaten – die Nachricht ist dann optional
-      msg.required = !L;
-      msg.previousElementSibling.textContent = L ? "Nachricht (optional)" : "Nachricht *";
-    }
-    topic.addEventListener("change", sync);
-    // Erstzulassung automatisch als MM/JJJJ formatieren
-    var reg = form.querySelector("[name=reg]");
-    if (reg) reg.addEventListener("input", function () {
-      var d = reg.value.replace(/\D/g, "").slice(0, 6);
-      reg.value = d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
-    });
-    function text() {
-      var d = new FormData(form), L = LABELS[d.get("topic")];
-      var lines = ["Anliegen: " + d.get("topic"), "Name: " + d.get("name"), "Telefon: " + (d.get("phone") || "–"), "E-Mail: " + (d.get("email") || "–")];
-      if (L) {
-        lines.push("", L.legend + ":");
-        [["make", "Marke"], ["model", "Modell"], ["type", "Fahrzeugtyp"], ["doors", "Türen"], ["reg", L.reg.replace(" *", "")], ["km", L.km.replace(" *", "")], ["fuel", "Kraftstoff"], ["gear", "Getriebe"], ["price", L.price]].forEach(function (f) {
-          var v = d.get(f[0]); if (v) lines.push("- " + f[1] + ": " + v);
-        });
-      } else if (d.get("car")) lines.push("Fahrzeug: " + d.get("car"));
-      if (d.get("message")) lines.push("", d.get("message"));
-      return lines.join("\n");
-    }
+  /* ---------- Formulare → E-Mail oder WhatsApp (es wird nichts an einen Server gesendet) ---------- */
+  function sendForm(form, subject, text) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (!form.reportValidity()) return;
-      var d = new FormData(form);
-      location.href = "mailto:" + C.email + "?subject=" + encodeURIComponent("Anfrage über Website: " + d.get("topic")) + "&body=" + encodeURIComponent(text());
+      location.href = "mailto:" + C.email + "?subject=" + encodeURIComponent(subject()) + "&body=" + encodeURIComponent(text());
     });
     var wa = form.querySelector("[data-wa-send]");
     if (wa) wa.addEventListener("click", function () {
       if (!form.reportValidity()) return;
       window.open("https://wa.me/" + C.whatsapp + "?text=" + encodeURIComponent(text()), "_blank", "noopener");
     });
-    function choose(v) {
-      for (var i = 0; i < topic.options.length; i++) if (topic.options[i].value === v) { topic.value = v; sync(); return; }
+  }
+  function forms() {
+    // Allgemeines Kontaktformular
+    var form = document.querySelector("[data-contact-form]");
+    if (form) {
+      var topic = form.querySelector("[name=topic]");
+      sendForm(form, function () { return "Anfrage über Website: " + topic.value; }, function () {
+        var d = new FormData(form);
+        var lines = ["Anliegen: " + d.get("topic"), "Name: " + d.get("name"), "Telefon: " + (d.get("phone") || "–"), "E-Mail: " + (d.get("email") || "–")];
+        if (d.get("car")) lines.push("Fahrzeug: " + d.get("car"));
+        lines.push("", d.get("message") || "");
+        return lines.join("\n");
+      });
+      var choose = function (v) {
+        for (var i = 0; i < topic.options.length; i++) if (topic.options[i].value === v) { topic.value = v; return; }
+      };
+      document.querySelectorAll("[data-topic]").forEach(function (a) {
+        a.addEventListener("click", function () { choose(a.getAttribute("data-topic")); });
+      });
+      var q = new URLSearchParams(location.search).get("anliegen");
+      if (q) choose(q);
     }
-    // Links wie „Auto bewerten lassen“ wählen das passende Anliegen vor
-    document.querySelectorAll("[data-topic]").forEach(function (a) {
-      a.addEventListener("click", function () { choose(a.getAttribute("data-topic")); });
-    });
-    // …auch von anderen Seiten aus (z. B. index.html?anliegen=Suchauftrag#kontakt)
-    var q = new URLSearchParams(location.search).get("anliegen");
-    if (q) choose(q);
-    sync();
+
+    // Ankauf-Formular: Fahrzeugdaten für die Bewertung
+    var ank = document.querySelector("[data-ankauf-form]");
+    if (ank) {
+      var reg = ank.querySelector("[data-reg]");
+      if (reg) reg.addEventListener("input", function () {
+        var d = reg.value.replace(/\D/g, "").slice(0, 6);
+        reg.value = d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
+      });
+      sendForm(ank, function () {
+        var d = new FormData(ank);
+        return "Fahrzeugankauf: " + d.get("make") + " " + d.get("model");
+      }, function () {
+        var d = new FormData(ank);
+        var lines = ["Fahrzeugankauf – Bitte um Bewertung", ""];
+        [["make", "Marke"], ["model", "Modell"], ["type", "Fahrzeugtyp"], ["doors", "Anzahl der Türen"], ["reg", "Erstzulassung"], ["km", "Kilometerstand"], ["fuel", "Kraftstoffart"], ["gear", "Getriebe"], ["price", "Preis (Vorstellung)"]].forEach(function (f) {
+          lines.push(f[1] + ": " + (d.get(f[0]) || "–"));
+        });
+        lines.push("", "Name: " + d.get("name"), "Telefon: " + d.get("phone"), "E-Mail: " + (d.get("email") || "–"));
+        if (d.get("message")) lines.push("", "Anmerkungen: " + d.get("message"));
+        return lines.join("\n");
+      });
+    }
   }
 
   /* ---------- Start ---------- */

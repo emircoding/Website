@@ -823,17 +823,20 @@ ul { margin: 0; padding: 0; list-style: none; }
 .footer__bottom button:hover { color: var(--white); }
 
 .inline-link { color: inherit; text-decoration: underline; font: inherit; }
-/* Fahrzeugdaten im Anfrageformular (Ankauf / Suchauftrag) */
 [hidden] { display: none !important; }
-.vehicle {
-  grid-column: 1 / -1; margin: 4px 0 0; padding: 18px;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px;
-  border: 1px solid var(--line); border-radius: 8px; background: var(--paper-2);
-  animation: fadeUp .6s var(--ease);
+
+/* Ankauf: eigenes Formular mit Fahrzeugdaten */
+.ankauf { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(32px, 6vw, 96px); align-items: start; }
+.ankauf__intro { position: sticky; top: calc(var(--header-h) + 40px); }
+.ankauf__intro .checklist { margin-bottom: 28px; }
+.form--ankauf { box-shadow: 0 40px 80px -50px rgba(0, 0, 0, .35), 0 0 0 1px var(--line); border-radius: 10px; }
+.form--ankauf h3 { margin-bottom: 0; }
+.form__sub { grid-column: 1 / -1; color: var(--mute); font-size: 15px; margin-top: -6px; }
+.form__group {
+  grid-column: 1 / -1; margin-top: 12px; padding-top: 16px; border-top: 1px solid var(--line);
+  font-family: var(--f-display); font-size: 12px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase;
 }
-.vehicle legend { padding: 0 8px; font-family: var(--f-display); font-weight: 600; font-size: 15px; }
-.vehicle .field input, .vehicle .field select { background: var(--white); }
-.vehicle__hint { grid-column: 1 / -1; font-size: 13px; color: var(--mute); }
+.form--ankauf .field label { letter-spacing: .12em; }
 
 /* Google-Bewertungen */
 .rating { display: grid; gap: 8px; justify-items: start; }
@@ -916,7 +919,8 @@ ul { margin: 0; padding: 0; list-style: none; }
   .stat:nth-child(2) { border-right: 0; }
   .stat:nth-child(3) { padding-left: 0; }
   .stat:nth-child(n+3) { border-top: 1px solid var(--line); margin-top: 28px; }
-  .split, .contact, .stock { grid-template-columns: 1fr; }
+  .split, .contact, .stock, .ankauf { grid-template-columns: 1fr; }
+  .ankauf__intro { position: static; }
   .footer__grid { grid-template-columns: 1fr 1fr; }
   .footer__brand { grid-column: 1 / -1; }
   .statement__row { grid-template-columns: 1fr; }
@@ -943,7 +947,9 @@ ul { margin: 0; padding: 0; list-style: none; }
   .mde-frame__bar { padding: 10px 14px; gap: 12px; }
   .mde-frame__dots, .hide-sm { display: none; }
   .reviews__track { grid-auto-columns: 86%; margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter) 10px; scroll-padding: 0 var(--gutter); }
-  .vehicle { padding: 14px; gap: 12px; }
+  .form.form--ankauf { grid-template-columns: 1fr 1fr; }
+  .form--ankauf h3, .form--ankauf .form__actions .btn { grid-column: 1 / -1; }
+  .form--ankauf .form__actions { display: grid; }
   .consent { left: 10px; bottom: calc(10px + var(--safe-bottom)); width: calc(100% - 20px); padding: 20px 18px 16px; }
   .step { min-height: 0; }
   .form { grid-template-columns: 1fr; }
