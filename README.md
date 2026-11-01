@@ -60,7 +60,7 @@ Einmal dort ändern → alle Seiten, Footer, Impressum, Buttons übernehmen es a
 
 ⚠️ **Vor dem offiziellen Start:** echte Daten eintragen, im Impressum den gelben Hinweis entfernen und die Datenschutzerklärung prüfen lassen.
 
-## 4. mobile.de verbinden (Live-Bestand)
+## 4. mobile.de verbinden (Bestand)
 
 Die Seite **Fahrzeuge** zeigt oben das eigene Design und darunter den **kompletten Bestand direkt von mobile.de** (eingebettet).
 Alles synchronisiert sich automatisch: Neue Inserate erscheinen sofort, Änderungen und Fotos werden übernommen, verkaufte Fahrzeuge verschwinden – auf der Website muss nie etwas gepflegt werden.

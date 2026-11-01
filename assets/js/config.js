@@ -30,7 +30,7 @@ window.AZN_CONFIG = {
   // ===== mobile.de =====
   // Ihre Kunden-ID bei mobile.de (steht im mobile.de-Händlerbereich, z. B. "12345678").
   // Sobald sie hier steht, zeigt die Seite „Fahrzeuge“ automatisch den kompletten
-  // Live-Bestand von mobile.de – neue Fahrzeuge erscheinen sofort, verkaufte verschwinden.
+  // Bestand von mobile.de – neue Fahrzeuge erscheinen sofort, verkaufte verschwinden.
   mobileDeCustomerId: "",
 
   // Optional: Adresse Ihrer Händlerseite auf mobile.de (für „In neuem Tab öffnen“),

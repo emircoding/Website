@@ -44,7 +44,7 @@
     }
   }
 
-  /* ---------- mobile.de: kompletter Live-Bestand eingebettet ---------- */
+  /* ---------- mobile.de: kompletter Bestand eingebettet ---------- */
   function mobileDeEmbedUrl() {
     if (C.mobileDeEmbed) return C.mobileDeEmbed;
     var id = String(C.mobileDeCustomerId || "").trim();
@@ -56,7 +56,7 @@
     var status = box.querySelector("[data-mde-status]"), url = mobileDeEmbedUrl();
     if (!url) {
       var st = box.querySelector(".mde-frame__state");
-      st.insertAdjacentHTML("beforeend", "<p>Hier erscheint der komplette Fahrzeugbestand live von mobile.de. Dafür einmal die mobile.de-Kunden-ID in <code>assets/js/config.js</code> eintragen.</p>");
+      st.insertAdjacentHTML("beforeend", "<p>Hier erscheint der komplette Fahrzeugbestand von mobile.de. Dafür einmal die mobile.de-Kunden-ID in <code>assets/js/config.js</code> eintragen.</p>");
       if (status) status.textContent = "Noch nicht verbunden";
       return;
     }
