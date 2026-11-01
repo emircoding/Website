@@ -117,17 +117,30 @@ async function init() {
   const headGlow = glowAt("BodyHeadlights", 0xe8f0ff, 1.1, 1);
   const tailGlow = glowAt("BodyTaillights", 0xff2a2a, 0.9, -1);
 
-  // Räder: um die Querachse drehen
-  const wheels = ["WheelFrontL", "WheelFrontR", "WheelRearL", "WheelRearR"].map((n) => car.getObjectByName(n));
+  // Räder: Felge + Reifen + Bremsscheibe drehen sich um die exakte Radmitte, der Bremssattel bleibt stehen
+  const wheelNodes = ["WheelFrontL", "WheelFrontR", "WheelRearL", "WheelRearR"].map((n) => car.getObjectByName(n));
   const axleWorld = wp("WheelFrontL").sub(wp("WheelFrontR")).normalize();
-  // Achse in das Koordinatensystem des jeweiligen Rad-Elternteils umrechnen (Modell ist intern gedreht)
-  const wheelAxes = wheels.map((w) => {
-    if (!w || !w.parent) return null;
-    const pq = new THREE.Quaternion(); w.parent.getWorldQuaternion(pq);
-    return axleWorld.clone().applyQuaternion(pq.invert()).normalize();
+  car.updateMatrixWorld(true);
+  const wheels = [], wheelAxes = [];
+  wheelNodes.forEach((node) => {
+    if (!node) { wheels.push(null); wheelAxes.push(null); return; }
+    const spinning = node.children.filter((c) => !/BrakePad/i.test(c.name));
+    // Radmitte = Mitte des Reifens/der Felge (nicht der Bremssattel)
+    const bb = new THREE.Box3();
+    spinning.forEach((c) => bb.expandByObject(c));
+    const center = bb.getCenter(new THREE.Vector3());
+    const pivotG = new THREE.Group();
+    pivotG.name = node.name + "Spin";
+    node.add(pivotG);
+    pivotG.position.copy(node.worldToLocal(center.clone()));
+    pivotG.updateMatrixWorld(true);
+    spinning.forEach((c) => pivotG.attach(c)); // Lage im Raum bleibt erhalten
+    const pq = new THREE.Quaternion(); node.getWorldQuaternion(pq);
+    wheels.push(pivotG);
+    wheelAxes.push(axleWorld.clone().applyQuaternion(pq.invert()).normalize());
   });
   const qTmp = new THREE.Quaternion();
-  const wheelBox = new THREE.Box3().setFromObject(wheels[0]);
+  const wheelBox = new THREE.Box3().setFromObject(wheels[0] || wheelNodes[0]);
   const wheelR = wheelBox.getSize(new THREE.Vector3()).y / 2;
   const rearContact = () => { const v = wp("WheelRearL"); v.y = 0.02; return v; };
 
