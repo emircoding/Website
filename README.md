@@ -98,11 +98,12 @@ In der gewählten App ist die E-Mail fertig vorbereitet (Empfänger, Betreff, fr
 
 ## 8. 3D-Auto auf der Startseite
 
-Das Auto im großen Startbereich ist ein echtes 3D-Modell (three.js, Dateien lokal in `assets/vendor/three/` und `assets/3d/auto.glb`, ca. 3 MB). Es fährt ein, und beim Scrollen gehen Licht an, der Reifen qualmt und es fährt weg.
-- **Zurück zum gezeichneten Auto:** in `assets/js/config.js` `auto3d: false` setzen.
+Das Auto im großen Startbereich ist ein echtes 3D-Modell (three.js, Dateien lokal in `assets/vendor/three/` und `assets/3d/auto.glb`, ca. 1,9 MB): Beim Öffnen driftet es durch den Schriftzug „NAGOLD“ und bleibt mittig davor stehen. Beim Scrollen gehen die Lichter an, die Hinterräder qualmen, dann driftet es rechts hinaus. Zurückscrollen spult alles rückwärts.
+- **Zurück zum gezeichneten Auto:** in `assets/js/config.js` `auto3d: false` setzen (z. B. sofort, falls es jemals eine Beanstandung wegen des Fahrzeugdesigns gibt).
 - **Komplette Sicherung des Stands vor dem 3D-Auto:** GitHub-Branch `sicherung-vor-3d-auto`.
-- Ohne WebGL (sehr alte Geräte) erscheint automatisch das gezeichnete Auto.
-- Modell: „Car Concept“ von Eric Chadwick / Darmstadt Graphics Group, CC BY 4.0 (Namensnennung steht im Impressum – nicht entfernen).
+- Ohne WebGL (sehr alte Geräte) erscheint automatisch das gezeichnete Auto. Wer „Bewegung reduzieren“ eingestellt hat, sieht das Auto direkt stehend.
+- Modell: „Free Porsche 911 Carrera 4S“ von Karol Miklas (Sketchfab), CC BY-SA 4.0. Bearbeitet: Hersteller-Logos, Wappen und Schriftzüge entfernt, Fantasie-Kennzeichen, seidenmatter Lack, vereinfacht/komprimiert. Die bearbeitete Datei steht ebenfalls unter CC BY-SA 4.0. Die Namensnennung und der Hinweis „keine Verbindung zum Hersteller“ stehen im Impressum – nicht entfernen.
+- Auf der Website selbst (Texte, Überschriften, Werbung) den Markennamen des Fahrzeugs **nicht** verwenden – das Auto ist nur Gestaltung, kein Angebot.
 
 ## 7. Google-Bewertungen
 

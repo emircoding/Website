@@ -391,17 +391,20 @@
     var parts = [], live = false, target = 0, cur = 0, lights = 0, lightsOn = false, flick = 0;
     var rearA = 0, frontA = 0, lastX = 0, lastT = 0, accEx = 0, accTire = 0, accLine = 0, visible = true;
     function goLive() { if (live) return; live = true; hero.classList.add("is-live"); }
-    svg.addEventListener("animationend", function (e) { if (e.animationName === "driveIn") goLive(); });
+    svg.addEventListener("animationend", function (e) { if (e.animationName === "driveIn" && !D3()) goLive(); });
     // 3D-Auto (falls geladen) übernimmt Räder und Licht; das gezeichnete Auto bleibt als Rückfall
     var D3 = function () { return window.AZN3D && window.AZN3D.ready ? window.AZN3D : null; };
-    hero.addEventListener("animationend", function (e) { if (e.animationName === "driveIn" && e.target.classList.contains("hero__car3d")) goLive(); });
-    setTimeout(goLive, 3200);
+    // 3D-Auto meldet sich, sobald er nach dem Drift steht
+    document.addEventListener("azn:carparked", goLive);
+    if (D3() && D3().parked && D3().parked()) goLive();
+    setTimeout(goLive, 4200);
 
     function read() {
       var r = pin.getBoundingClientRect(), total = pin.offsetHeight - innerHeight;
       target = total > 0 ? clamp(-r.top / total) : 0;
       visible = r.bottom > 0 && r.top < innerHeight;
     }
+    window.AZN_SMOKE = function (kind, px, py, k) { var hr = hero.getBoundingClientRect(); emit(kind, px - hr.left, py - hr.top, k); };
     function emit(kind, x, y, k) {
       var p;
       if (kind === "exhaust") p = { sp: SP.exhaust, x: x, y: y, vx: -(30 + Math.random() * 60) * k, vy: -(6 + Math.random() * 18) * k, r: 3 * k, g: (18 + Math.random() * 14) * k, max: 1.3 + Math.random() * .9, a: .32 };
@@ -429,7 +432,8 @@
       var x = go * (W * 1.25 + 260);
       var jit = burn > .05 ? (Math.random() - .5) * 1.6 * burn : 0;
       var tilt = -(burn * 1.1 + Math.min(1, g * 5) * .7 * (1 - g));
-      drive.style.transform = "translate3d(" + x.toFixed(1) + "px," + jit.toFixed(2) + "px,0) rotate(" + tilt.toFixed(3) + "deg)";
+      if (D3()) drive.style.transform = "";
+      else drive.style.transform = "translate3d(" + x.toFixed(1) + "px," + jit.toFixed(2) + "px,0) rotate(" + tilt.toFixed(3) + "deg)";
 
       var d3 = D3();
       var rect = (d3 ? d3.canvas : svg).getBoundingClientRect(), hr = hero.getBoundingClientRect();
@@ -438,7 +442,7 @@
       var wheelR = 50 * k, dx = x - lastX, vx = dx / Math.max(dt, .001); lastX = x;
       var roll = dx / wheelR * 57.2958;
       var tail = Math.min(1, lights * .55 + burn * .45 + Math.min(1, g * 4) * .2);
-      if (d3) { d3.state.lights = lights; d3.state.tail = tail; d3.state.burn = live ? burn : 0; }
+      if (d3) { d3.state.lights = lights; d3.state.tail = tail; d3.state.burn = live ? burn : 0; d3.state.g = live ? g : 0; }
       if (live && !d3) {
         rearA += roll + burn * 1700 * dt;
         frontA += roll;
