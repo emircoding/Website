@@ -15,8 +15,6 @@ assets/js/config.js   ★ FIRMENDATEN (Adresse, Telefon, WhatsApp, Öffnungszeit
 assets/css/style.css  Design & Animationen
 assets/img/           Logo, Icons, Vorschaubild
 assets/fonts/         Schriften (lokal → DSGVO-konform, kein Google Fonts)
-assets/3d/            3D-Auto (glTF-Modell)
-assets/vendor/three/  three.js (3D-Darstellung, MIT-Lizenz)
 _headers              Sicherheits- & Cache-Einstellungen (nur Cloudflare Pages)
 api/                  Formular-Versand per E-Mail + PDF beim Ankauf (PHP)
 .htaccess             Einstellungen für normale Webhoster (Apache)
@@ -96,15 +94,6 @@ In der gewählten App ist die E-Mail fertig vorbereitet (Empfänger, Betreff, fr
 
 **Später mit Webspace + PHP: `formMode: "server"`** – dann senden die Formulare direkt (ohne Mail-App), beim Ankauf mit Foto-Upload und PDF-Anhang (Ordner `api/`). Beim Umschalten bitte Bescheid geben, damit die Datenschutzerklärung angepasst wird.
 
-## 8. 3D-Auto auf der Startseite
-
-Das Auto im großen Startbereich ist ein echtes 3D-Modell (three.js, Dateien lokal in `assets/vendor/three/` und `assets/3d/auto.glb`, ca. 1,9 MB): Beim Öffnen driftet es durch den Schriftzug „NAGOLD“ und bleibt mittig davor stehen. Beim Scrollen gehen die Lichter an, die Hinterräder qualmen, dann driftet es rechts hinaus. Zurückscrollen spult alles rückwärts.
-- **Zurück zum gezeichneten Auto:** in `assets/js/config.js` `auto3d: false` setzen (z. B. sofort, falls es jemals eine Beanstandung wegen des Fahrzeugdesigns gibt).
-- **Komplette Sicherung des Stands vor dem 3D-Auto:** GitHub-Branch `sicherung-vor-3d-auto`.
-- Ohne WebGL (sehr alte Geräte) erscheint automatisch das gezeichnete Auto. Wer „Bewegung reduzieren“ eingestellt hat, sieht das Auto direkt stehend.
-- Modell: „Free Porsche 911 Carrera 4S“ von Karol Miklas (Sketchfab), CC BY-SA 4.0. Bearbeitet: Hersteller-Logos, Wappen und Schriftzüge entfernt, Fantasie-Kennzeichen, seidenmatter Lack, vereinfacht/komprimiert. Die bearbeitete Datei steht ebenfalls unter CC BY-SA 4.0. Die Namensnennung und der Hinweis „keine Verbindung zum Hersteller“ stehen im Impressum – nicht entfernen.
-- Auf der Website selbst (Texte, Überschriften, Werbung) den Markennamen des Fahrzeugs **nicht** verwenden – das Auto ist nur Gestaltung, kein Angebot.
-
 ## 7. Google-Bewertungen
 
 Echte Werte in `assets/js/config.js` unter `google` eintragen (Note, Anzahl, Profil-Link, ausgewählte Bewertungen). Solange keine Note eingetragen ist, zeigt die Startseite einen Aufruf zum Bewerten.
@@ -131,3 +120,8 @@ Echte Werte in `assets/js/config.js` unter `google` eintragen (Note, Anzahl, Pro
 - iPhone: Safe-Area (Notch/Dynamic Island), kein Auto-Zoom bei Formularen, Homescreen-Icon, flüssiges Scrollen
 - Barrierearm: Tastaturbedienung, `prefers-reduced-motion` wird respektiert
 - DSGVO: eigene Seite ohne Cookies und Tracking, Schriften lokal (die eingebettete mobile.de-Seite ist in der Datenschutzerklärung erwähnt)
+
+## Gesicherte Varianten
+
+- **Aktuell:** gezeichnetes Auto im Startbereich (fährt beim Scrollen mit Licht, Burnout und Reifenqualm weg).
+- **3D-Sportwagen mit Drift** (Porsche-Modell, wieder entfernt): komplett gesichert im GitHub-Branch `sicherung-porsche-3d` – kann jederzeit zurückgeholt werden.
