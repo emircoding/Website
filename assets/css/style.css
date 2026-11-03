@@ -215,6 +215,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   position: sticky;
   top: 0;
   z-index: 50;
+  box-shadow: 0 1px 0 var(--line); /* Linie unter der Kopfzeile – auch ganz oben auf der Startseite */
   transition: background .5s var(--ease), box-shadow .5s var(--ease), transform .6s var(--ease);
 }
 .header.is-scrolled {
