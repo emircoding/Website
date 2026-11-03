@@ -120,8 +120,3 @@ Echte Werte in `assets/js/config.js` unter `google` eintragen (Note, Anzahl, Pro
 - iPhone: Safe-Area (Notch/Dynamic Island), kein Auto-Zoom bei Formularen, Homescreen-Icon, flüssiges Scrollen
 - Barrierearm: Tastaturbedienung, `prefers-reduced-motion` wird respektiert
 - DSGVO: eigene Seite ohne Cookies und Tracking, Schriften lokal (die eingebettete mobile.de-Seite ist in der Datenschutzerklärung erwähnt)
-
-## Gesicherte Varianten
-
-- **Aktuell:** gezeichnetes Auto im Startbereich (fährt beim Scrollen mit Licht, Burnout und Reifenqualm weg).
-- **3D-Sportwagen mit Drift** (Porsche-Modell, wieder entfernt): komplett gesichert im GitHub-Branch `sicherung-porsche-3d` – kann jederzeit zurückgeholt werden.
