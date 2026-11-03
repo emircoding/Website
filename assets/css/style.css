@@ -391,40 +391,29 @@ ul { margin: 0; padding: 0; list-style: none; }
 .is-ready .hero__word span { animation: letterIn 1.2s var(--ease) forwards; animation-delay: calc(var(--i) * 70ms + .1s); }
 @keyframes letterIn { to { transform: none; opacity: 1; } }
 
-.hero__car-wrap {
+.hero__space {
   position: relative;
-  z-index: 2;
   width: min(1040px, 96%);
   margin-top: clamp(40px, 9vw, 150px);
-  transition: transform 1.2s var(--ease);
+  aspect-ratio: 900 / 290;
 }
-.hero__car { width: 100%; height: auto; transform: translateX(-120vw); }
 .hero__word { transition: transform 1.2s var(--ease); }
 [data-parallax] { translate: 0 var(--py, 0px); }
-.is-ready .hero__car { animation: driveIn 2.2s .55s var(--ease) forwards; }
-@keyframes driveIn {
-  0% { transform: translateX(-120vw) skewX(8deg); }
-  70% { transform: translateX(1.5%) skewX(-1deg); }
-  100% { transform: translateX(0) skewX(0); }
-}
-.hero__car .wheel { transform-box: fill-box; transform-origin: center; }
-.is-ready .hero__car .wheel { animation: spin 2.2s .55s var(--ease) forwards; }
-@keyframes spin { from { transform: rotate(-1440deg); } to { transform: rotate(0); } }
-.hero__car .reflex { animation: reflex 5s 3s var(--ease-in-out) infinite; }
-@keyframes reflex { 0%, 60% { transform: translateX(-900px); } 100% { transform: translateX(900px); } }
-.hero.is-live .hero__car .wheel { animation: none; }
-
-/* Scroll-Fahrt: Hero bleibt stehen, während das Auto startet und wegfährt */
+/* Speed-Schrift: Hero bleibt stehen, während die Buchstaben beim Scrollen davonrasen */
 .hero-pin { position: relative; height: 270vh; margin-top: calc(var(--header-h) * -1); }
 .hero-pin .hero { position: sticky; top: 0; margin-top: 0; height: 100vh; height: 100svh; min-height: 560px; }
-.hero__smoke { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
-.hero__car-drive { transform-origin: 24% 74%; will-change: transform; }
-.hero__car { overflow: visible; --lights: 0; --tail: 0; }
-.hero__car .beam { opacity: calc(var(--lights) * .6); }
-.hero__car .lamp { opacity: calc(.35 + var(--lights) * .65); }
-.hero__car .drl { opacity: var(--lights); }
-.hero__car .tailglow { opacity: var(--tail); }
-.hero__car .tail { filter: brightness(calc(1 + var(--tail) * .8)); }
+.hero__fx { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.hero__fx--front { z-index: 2; }
+.hero--speed .hero__word span { animation: none; }
+.hero__tagline {
+  position: absolute; inset: 0; z-index: 2; margin: 0; padding-left: .28em;
+  display: flex; align-items: center; justify-content: center; pointer-events: none;
+  font-family: var(--f-display); font-weight: 600; letter-spacing: .28em; text-transform: uppercase;
+  line-height: 1; color: var(--ink); white-space: nowrap;
+}
+.hero__tagline span { display: block; opacity: 0; }
+.hero__tagline i { font-style: normal; }
+@media (max-width: 599px) { .hero__tagline { flex-direction: column; gap: .7em; } .hero__tagline i { display: none; } }
 .hero__hint {
   position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); z-index: 4;
   display: inline-flex; align-items: center; gap: 10px; white-space: nowrap;
@@ -434,21 +423,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 .hero.is-live .hero__hint { opacity: var(--hint, 1); }
 .hero__hint span { width: 8px; height: 8px; border-radius: 50%; background: #d63a3a; box-shadow: 0 0 0 0 rgba(214, 58, 58, .6); animation: pulseRed 1.6s infinite; }
 @keyframes pulseRed { 70% { box-shadow: 0 0 0 9px rgba(214, 58, 58, 0); } 100% { box-shadow: 0 0 0 0 rgba(214, 58, 58, 0); } }
-.split__visual svg.car { overflow: visible; }
-.split__visual .beam { opacity: .35; }
-.split__visual .tailglow { opacity: .8; }
-
-.speedlines { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.speedlines i {
-  position: absolute;
-  left: -40%;
-  height: 1px;
-  width: 40%;
-  background: linear-gradient(90deg, transparent, rgba(11, 11, 12, .35), transparent);
-  opacity: 0;
-}
-.is-ready .speedlines i { animation: streak 2.4s var(--ease) forwards; }
-@keyframes streak { 0% { left: -40%; opacity: 0; } 20% { opacity: 1; } 100% { left: 120%; opacity: 0; } }
 
 .hero__bottom {
   position: relative;
@@ -1068,7 +1042,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   .hero__grid { padding-top: 28px; padding-bottom: 52px; }
   .hero__hint { top: 2vh; bottom: auto; font-size: 10px; letter-spacing: .22em; }
   .hero__word { font-size: 25.5vw; }
-  .hero__car-wrap { width: 112%; margin-top: 26vw; }
+  .hero__space { width: 112%; margin-top: 26vw; }
   .hero__stage { min-height: 0; padding: 9vh 0 5vh; }
   .hero__meta { display: none; }
   .hero__ctas { width: 100%; flex-direction: column; align-items: stretch; gap: 18px; }
@@ -1092,10 +1066,9 @@ ul { margin: 0; padding: 0; list-style: none; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
   [data-reveal], .split-line > span { opacity: 1 !important; transform: none !important; }
   .img-reveal::after { display: none; }
-  .hero__car { transform: none !important; }
   .hero-pin { height: auto; }
   .hero-pin .hero { position: relative; }
-  .hero__hint, .hero__smoke { display: none; }
+  .hero__hint, .hero__fx, .hero__tagline { display: none; }
   .consent { transition: none; }
   .hero__word span { transform: none !important; opacity: 1 !important; }
   .marquee__track { animation: none; }

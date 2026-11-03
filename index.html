@@ -24,7 +24,7 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="assets/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/style.css?v=8e754b3f">
+<link rel="stylesheet" href="assets/css/style.css?v=070fff0d">
 </head>
 <body>
 <div class="preloader" aria-hidden="true"><div>
@@ -85,43 +85,14 @@
 <main id="main">
   <div class="hero-pin" data-hero-pin>
   <section class="hero" aria-label="Willkommen">
-    <canvas class="hero__smoke" aria-hidden="true"></canvas>
-    <div class="speedlines" aria-hidden="true"></div>
+    <canvas class="hero__fx hero__fx--back" aria-hidden="true"></canvas>
+    <canvas class="hero__fx hero__fx--front" aria-hidden="true"></canvas>
     <div class="container hero__grid">
       <p class="hero__claim">Automobile<br>mit Charakter.<br>Aus Nagold.</p>
       <div class="hero__stage">
         <div class="hero__word" aria-hidden="true"><span style="--i:0">N</span><span style="--i:1">A</span><span style="--i:2">G</span><span style="--i:3">O</span><span style="--i:4">L</span><span style="--i:5">D</span></div>
-        <div class="hero__car-wrap"><div class="hero__car-drive"><svg class="hero__car" viewBox="0 0 900 290" role="img" aria-label="Sportliches Coupé">
-<defs>
-<linearGradient id="hcb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#46464b"/><stop offset=".42" stop-color="#151517"/><stop offset="1" stop-color="#050506"/></linearGradient>
-<linearGradient id="hcg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a919b"/><stop offset=".5" stop-color="#262a31"/><stop offset="1" stop-color="#0a0b0d"/></linearGradient>
-<linearGradient id="hcs" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-<linearGradient id="hcr" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-<radialGradient id="hrim"><stop offset="0" stop-color="#f0f0f0"/><stop offset=".7" stop-color="#a1a1a6"/><stop offset="1" stop-color="#4e4e53"/></radialGradient>
-<radialGradient id="hsh"><stop offset="0" stop-color="#000" stop-opacity=".5"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
-<linearGradient id="hbeam" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".35" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-<radialGradient id="htail"><stop offset="0" stop-color="#ff2a2a" stop-opacity=".85"/><stop offset=".4" stop-color="#ff2a2a" stop-opacity=".3"/><stop offset="1" stop-color="#ff2a2a" stop-opacity="0"/></radialGradient>
-<clipPath id="hclip"><path d="M60 214 C 52 200, 50 178, 56 164 C 60 152, 72 146, 96 142 C 150 134, 200 120, 250 98 C 300 76, 360 64, 420 62 C 480 60, 530 72, 580 98 C 610 112, 640 120, 690 126 C 760 134, 820 142, 846 156 C 858 164, 860 182, 852 200 L 846 214 L 758 214 A 58 58 0 0 0 642 214 L 273 214 A 58 58 0 0 0 157 214 Z"/></clipPath>
-</defs>
-<path class="beam" fill="url(#hbeam)" d="M842 150 L 1420 70 L 1420 250 Z"/>
-<ellipse cx="455" cy="264" rx="440" ry="17" fill="url(#hsh)"/>
-<rect x="58" y="199" width="26" height="8" rx="4" fill="#2c2c30"/><rect x="58" y="200.5" width="6" height="5" rx="2.5" fill="#0a0a0b"/>
-<path fill="url(#hcb)" style="stroke:var(--cut,#ecebe8)" stroke-width="7" paint-order="stroke" stroke-linejoin="round" d="M60 214 C 52 200, 50 178, 56 164 C 60 152, 72 146, 96 142 C 150 134, 200 120, 250 98 C 300 76, 360 64, 420 62 C 480 60, 530 72, 580 98 C 610 112, 640 120, 690 126 C 760 134, 820 142, 846 156 C 858 164, 860 182, 852 200 L 846 214 L 758 214 A 58 58 0 0 0 642 214 L 273 214 A 58 58 0 0 0 157 214 Z"/>
-<path fill="#060607" d="M157 214 A 58 58 0 0 1 273 214 Z"/><path fill="#060607" d="M642 214 A 58 58 0 0 1 758 214 Z"/>
-<path fill="url(#hcg)" d="M250 112 C 300 88, 360 76, 422 75 C 474 74, 520 88, 562 108 C 520 113, 400 116, 268 117 Z"/>
-<path fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="1.5" d="M262 110 C 310 90, 362 80, 422 79"/>
-<path stroke="#141416" stroke-width="8" d="M444 72 L 440 118"/>
-<path fill="none" stroke="url(#hcs)" stroke-width="2.5" d="M110 156 C 300 146, 560 142, 830 158"/>
-<path fill="none" stroke="#000" stroke-opacity=".7" stroke-width="2" d="M300 198 L 630 198"/>
-<path fill="none" stroke="#000" stroke-opacity=".7" stroke-width="2" d="M566 118 C 572 150, 572 180, 562 210"/>
-<path fill="#141416" d="M574 108 L 598 104 L 600 116 L 580 118 Z"/>
-<g clip-path="url(#hclip)"><rect class="reflex" x="0" y="40" width="160" height="200" fill="url(#hcr)" transform="skewX(-20)"/></g>
-<ellipse class="tailglow" cx="72" cy="157" rx="80" ry="30" fill="url(#htail)"/>
-<path class="tail" fill="#d63a3a" d="M57 160 L 98 148 L 100 154 L 60 168 Z"/>
-<path class="lamp" fill="#fafafa" d="M796 146 C 818 148, 836 154, 848 163 C 832 164, 812 160, 796 150 Z"/>
-<path class="drl" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" d="M792 142 C 812 143, 832 149, 846 157"/>
-<g class="wheel"><circle cx="215" cy="214" r="50" fill="#0a0a0b"/><circle cx="215" cy="214" r="36" fill="url(#hrim)"/><g stroke="#29292d" stroke-width="7" stroke-linecap="round"><path d="M215 214V182M215 214l30-10M215 214l19 26M215 214l-19 26M215 214l-30-10"/></g><circle cx="215" cy="214" r="8" fill="#19191b"/><circle cx="215" cy="214" r="49" fill="none" stroke="#2a2a2e" stroke-width="2"/></g><g class="wheel"><circle cx="700" cy="214" r="50" fill="#0a0a0b"/><circle cx="700" cy="214" r="36" fill="url(#hrim)"/><g stroke="#29292d" stroke-width="7" stroke-linecap="round"><path d="M700 214V182M700 214l30-10M700 214l19 26M700 214l-19 26M700 214l-30-10"/></g><circle cx="700" cy="214" r="8" fill="#19191b"/><circle cx="700" cy="214" r="49" fill="none" stroke="#2a2a2e" stroke-width="2"/></g>
-</svg></div></div>
+        <p class="hero__tagline" aria-hidden="true"><span>Ankauf · Verkauf</span><span><i>&nbsp;·&nbsp;</i>Finanzierung</span></p>
+        <div class="hero__space" aria-hidden="true"></div>
         <p class="hero__hint" aria-hidden="true"><span></span>Scrollen &amp; Motor starten</p>
         <h1 class="sr-only">Automobilzentrum Nagold – Gebrauchtwagen, Ankauf und Finanzierung</h1>
       </div>
@@ -416,6 +387,6 @@
 <a class="fab" data-href="wa" href="#" target="_blank" rel="noopener" aria-label="WhatsApp schreiben"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg></a>
 
 <script src="assets/js/config.js?v=41ba6cd8"></script>
-<script src="assets/js/main.js?v=2030a27f"></script>
+<script src="assets/js/main.js?v=437b8f2c"></script>
 </body>
 </html>

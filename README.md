@@ -110,8 +110,9 @@ Echte Werte in `assets/js/config.js` unter `google` eintragen (Note, Anzahl, Pro
 
 ## Technik & Features
 
-- Intro-Animation (Logo-Swoosh zeichnet sich), Auto fährt in den Hero ein (Räder drehen, Lack-Reflex)
-- **Scroll-Fahrt:** Beim Scrollen startet der Motor – Licht flackert an, Auspuff raucht, Hinterräder drehen durch mit Reifenqualm (Burnout), dann zieht das Auto aus dem Bild. Zurückscrollen spult alles rückwärts. Rauch als Partikel-Animation (flüssig auch auf dem iPhone)
+- Intro-Animation (Logo-Swoosh zeichnet sich), danach **Speed-Schrift**: die Buchstaben von „NAGOLD“ schießen einzeln mit Bewegungsunschärfe herein und bremsen mit kurzem roten Bremslicht
+- **Beim Scrollen:** die Buchstaben ducken sich kurz, dann rasen sie nacheinander rechts aus dem Bild (D zuerst) und „Ankauf · Verkauf · Finanzierung“ fährt herein. Zurückscrollen spult alles rückwärts. Wer „Bewegung reduzieren“ eingestellt hat, sieht den Schriftzug ruhig stehend
+- Sicherung des vorherigen Stands mit gezeichnetem Auto: GitHub-Branch `sicherung-mit-gezeichnetem-auto`
 - Wort-für-Wort-Einblendungen, Scroll-Text-Effekt, Zähler, Parallax, Laufband, magnetische Buttons, 3D-Kipp-Effekt der Fahrzeugkarten
 - Logo mit animiertem Chrom-Glanz
 - Fahrzeugbestand komplett live von mobile.de eingebettet (automatische Synchronisierung)
