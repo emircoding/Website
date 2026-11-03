@@ -395,8 +395,8 @@ ul { margin: 0; padding: 0; list-style: none; }
   position: relative;
   width: min(1040px, 96%);
   margin-top: clamp(40px, 9vw, 150px);
-  aspect-ratio: 900 / 290;
 }
+.hero__space::before { content: ""; display: block; padding-top: 32.22%; } /* Seitenverhältnis – auch für ältere iPhones */
 .hero__word { transition: transform 1.2s var(--ease); }
 [data-parallax] { translate: 0 var(--py, 0px); }
 /* Speed-Schrift: Hero bleibt stehen, während die Buchstaben beim Scrollen davonrasen */
@@ -1061,6 +1061,18 @@ ul { margin: 0; padding: 0; list-style: none; }
   .step { min-height: 0; }
   .form { grid-template-columns: 1fr; }
   .footer__grid { grid-template-columns: 1fr; }
+}
+/* Handy quer & sehr niedrige Fenster: Startbereich muss auf eine Bildschirmhöhe passen */
+@media (orientation: landscape) and (max-height: 540px) {
+  .hero, .hero-pin .hero { min-height: 0; }
+  .hero__grid { padding-top: 8px; padding-bottom: 46px; } /* Platz für die Infoleiste oben beim Laden */
+  .hero__claim, .hero__meta { font-size: 10px; line-height: 1.8; }
+  .hero__claim::after { margin-top: 6px; }
+  .hero__stage { min-height: 0; }
+  .hero__word { font-size: min(21.5vw, 27vh); font-size: min(21.5vw, 27svh); }
+  .hero__space { width: min(1040px, 46%); margin-top: 0; }
+  .hero__hint, .hero__meta { display: none; }
+  .hero__ctas { width: auto; flex-direction: row; align-items: center; gap: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }

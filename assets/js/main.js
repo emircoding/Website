@@ -356,6 +356,7 @@
     if (hero) {
       var w = hero.querySelector(".hero__word:not(.hero__word--outline)");
       hero.addEventListener("pointermove", function (e) {
+        if (e.pointerType && e.pointerType !== "mouse") return;
         var x = e.clientX / innerWidth - 0.5, y = e.clientY / innerHeight - 0.5;
         if (w) w.style.transform = "translate(" + x * -18 + "px," + y * -10 + "px)";
       });
@@ -373,7 +374,7 @@
     var spans = [].slice.call(word.querySelectorAll("span")), tags = tag ? [].slice.call(tag.children) : [];
     var B = back.getContext("2d"), F = front.getContext("2d");
     var W = 1, H = 1, dpr = 1, fs = 100, L = [], wy1 = 0, wh = 1, wcy = 0, lines = [], prevX = [];
-    var target = 0, cur = 0, start = null, lastT = null, idle = false, live = false;
+    var target = 0, cur = 0, startAt = Infinity, started = false, lastNow = 0, t = 0, idle = false, live = false, cw = 0, ch = 0;
     var INK = "rgba(11,11,12,";
     hero.classList.add("hero--speed");
     spans.forEach(function (s) { s.style.opacity = 0; });
@@ -384,13 +385,19 @@
     function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
     function measure() {
-      W = hero.clientWidth; H = hero.clientHeight; dpr = Math.min(2, window.devicePixelRatio || 1);
-      [back, front].forEach(function (c) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); });
-      var keep = spans.map(function (s) { return s.style.transform; }), wt = word.style.transform;
-      spans.forEach(function (s) { s.style.transform = "none"; }); word.style.transform = "none";
+      W = hero.clientWidth; H = hero.clientHeight;
+      // Schärfe wie das Display, aber Speicher begrenzen (große iPads)
+      dpr = Math.min(2, window.devicePixelRatio || 1, Math.sqrt(5e6 / Math.max(1, W * H)));
+      var nw = Math.round(W * dpr), nh = Math.round(H * dpr);
+      // iPhone: Die Adressleiste löst beim Scrollen "resize" aus – Canvas nur bei echter Größenänderung neu anlegen
+      if (nw !== cw || nh !== ch) { cw = nw; ch = nh; [back, front].forEach(function (c) { c.width = nw; c.height = nh; }); }
+      var keep = spans.map(function (s) { return s.style.transform; }), wt = word.style.transform, wtr = word.style.transition;
+      word.style.transition = "none"; word.style.transform = "none";
+      spans.forEach(function (s) { s.style.transform = "none"; });
       var hr = hero.getBoundingClientRect();
       L = spans.map(function (s) { var r = s.getBoundingClientRect(); return { x: r.left - hr.left, y: r.top - hr.top, w: r.width, h: r.height, cx: r.left - hr.left + r.width / 2 }; });
-      spans.forEach(function (s, i) { s.style.transform = keep[i]; }); word.style.transform = wt;
+      spans.forEach(function (s, i) { s.style.transform = keep[i]; });
+      word.style.transform = wt; void word.offsetWidth; word.style.transition = wtr;
       var wy0 = Math.min.apply(null, L.map(function (l) { return l.y; }));
       wy1 = Math.max.apply(null, L.map(function (l) { return l.y + l.h; }));
       wh = wy1 - wy0; wcy = (wy0 + wy1) / 2;
@@ -460,8 +467,14 @@
     function frame(now) {
       requestAnimationFrame(frame);
       var vis = read();
-      if (start === null) return;
-      var t = (now - start) / 1000, dt = lastT === null ? 1 / 60 : Math.max(1 / 240, Math.min(0.05, t - lastT)); lastT = t;
+      if (!started) {
+        // erst loslegen, wenn der Vorhang weg ist und der Tab wirklich sichtbar ist
+        if (now < startAt || document.visibilityState === "hidden") return;
+        started = true; lastNow = now;
+      }
+      // Zeit selbst aufsummieren: Hintergrund-Tab, Stromsparmodus oder ein Ruckler überspringen nichts
+      var dt = Math.min(0.1, Math.max(0, (now - lastNow) / 1000)); lastNow = now; t += dt;
+      dt = Math.max(1 / 240, dt);
       if (!vis) return;
       if (!live && t > 1.5) { live = true; hero.classList.add("is-live"); }
       cur += (target - cur) * Math.min(1, dt * 9);
@@ -476,7 +489,7 @@
     window.addEventListener("resize", measure);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
     // Start, sobald der Vorhang (Preloader) den Schriftzug freigibt
-    setTimeout(function () { start = performance.now(); }, document.querySelector(".preloader") ? 350 : 0);
+    startAt = performance.now() + (document.querySelector(".preloader") ? 350 : 0);
     requestAnimationFrame(frame);
   }
 
