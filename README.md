@@ -113,6 +113,7 @@ Echte Werte in `assets/js/config.js` unter `google` eintragen (Note, Anzahl, Pro
 - Intro-Animation (Logo-Swoosh zeichnet sich), danach **Speed-Schrift**: die Buchstaben von „NAGOLD“ schießen einzeln mit Bewegungsunschärfe herein und bremsen mit kurzem roten Bremslicht
 - **Beim Scrollen:** die Buchstaben ducken sich kurz, dann rasen sie nacheinander rechts aus dem Bild (D zuerst) und „Ankauf · Verkauf · Finanzierung“ fährt herein. Zurückscrollen spult alles rückwärts. Wer „Bewegung reduzieren“ eingestellt hat, sieht den Schriftzug ruhig stehend
 - Sicherung des vorherigen Stands mit gezeichnetem Auto: GitHub-Branch `sicherung-mit-gezeichnetem-auto`
+- Feine, langsam fließende Wellenlinien im Hintergrund der ganzen Website (dezent, liegen hinter allen Inhalten; bei „Bewegung reduzieren“ stehen sie still). Stand ohne Linien: Branch `sicherung-vor-hintergrund-linien`
 - Wort-für-Wort-Einblendungen, Scroll-Text-Effekt, Zähler, Parallax, Laufband, magnetische Buttons, 3D-Kipp-Effekt der Fahrzeugkarten
 - Logo mit animiertem Chrom-Glanz
 - Fahrzeugbestand komplett live von mobile.de eingebettet (automatische Synchronisierung)

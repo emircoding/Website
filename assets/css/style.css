@@ -52,6 +52,8 @@ html {
   scroll-padding-top: calc(var(--header-h) + 12px);
 }
 
+/* Hintergrund: feine Wellenlinien über die ganze Seite (liegt hinter allen Inhalten) */
+.bg-lines { position: fixed; left: 0; top: 0; width: 100%; height: 100vh; height: 100lvh; z-index: -1; pointer-events: none; }
 body {
   margin: 0;
   font-family: var(--f-body);
@@ -341,9 +343,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background:
-    radial-gradient(120% 70% at 50% 100%, #dcdbd7 0%, transparent 60%),
-    var(--paper);
+  background: radial-gradient(120% 70% at 50% 100%, rgba(11, 11, 12, .065) 0%, transparent 60%); /* durchsichtig → Hintergrund-Linien sichtbar */
 }
 .hero__grid {
   position: relative;
@@ -477,7 +477,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 /* ---------- Sections ---------- */
 .section { padding: clamp(72px, 11vw, 150px) 0; position: relative; }
-.section--white { background: var(--paper-2); }
+.section--white { background: rgba(255, 255, 255, .42); } /* hell, aber Linien scheinen leicht durch */
 .dark { background: var(--ink); color: var(--white); }
 .section__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: clamp(36px, 5vw, 64px); flex-wrap: wrap; }
 .section__title { font-size: clamp(34px, 5.4vw, 76px); font-weight: 700; letter-spacing: -.035em; margin-top: 16px; }

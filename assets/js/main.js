@@ -363,6 +363,46 @@
     }
   }
 
+  /* ---------- Hintergrund: feine Wellenlinien über die ganze Seite ---------- */
+  function bgLines() {
+    var c = document.createElement("canvas");
+    if (!c.getContext) return;
+    c.className = "bg-lines"; c.setAttribute("aria-hidden", "true");
+    document.body.insertBefore(c, document.body.firstChild);
+    var ctx = c.getContext("2d"), W = 0, H = 0, dpr = 1, gap = 14, t = 0, last = 0, lastNow = 0;
+    function size() {
+      var w = window.innerWidth, h = Math.max(window.innerHeight, c.clientHeight || 0);
+      if (w === W && Math.abs(h - H) < 2) return false; // iPhone-Adressleiste: nur bei echter Größenänderung neu anlegen
+      W = w; H = h;
+      dpr = Math.min(2, window.devicePixelRatio || 1, Math.sqrt(5e6 / Math.max(1, W * H)));
+      c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+      gap = W < 700 ? 11 : 14;
+      return true;
+    }
+    function draw() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      var sc = reduce ? 0 : (window.scrollY || 0) * 0.0012, n = Math.ceil(H / gap) + 4, step = W < 700 ? 13 : 16;
+      ctx.beginPath();
+      for (var i = 0; i < n; i++) {
+        var y0 = (i - 2) * gap, env = 0.55 + 0.45 * Math.sin(i * 0.085 + t * 0.12 + sc * 0.6), amp = gap * (0.5 + env * 1.05);
+        for (var x = 0; x <= W + step; x += step) {
+          var y = y0 + amp * (0.62 * Math.sin(x * 0.0055 + t * 0.45 + i * 0.23 + sc) + 0.38 * Math.sin(x * 0.012 - t * 0.6 + i * 0.11 - sc * 0.7));
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+      }
+      ctx.lineWidth = 1; ctx.strokeStyle = "rgba(11,11,12,.055)"; ctx.stroke();
+    }
+    size(); draw();
+    window.addEventListener("resize", function () { if (size()) draw(); });
+    if (reduce) return; // "Bewegung reduzieren": Linien stehen still
+    (function loop(now) {
+      requestAnimationFrame(loop);
+      if (document.hidden || now - last < 33) return; // ~30 Bilder/s reichen für die ruhige Bewegung
+      t += Math.min(0.1, (now - (lastNow || now)) / 1000); lastNow = now; last = now;
+      draw();
+    })(performance.now());
+  }
+
   /* ---------- Hero: Speed-Schrift – Buchstaben schießen rein, bremsen (Bremslicht), rasen beim Scrollen davon ---------- */
   function heroSpeed() {
     var pin = document.querySelector("[data-hero-pin]");
@@ -936,6 +976,7 @@
   /* ---------- Start ---------- */
   document.addEventListener("DOMContentLoaded", function () {
     applyConfig();
+    bgLines();
     reviews();
     consent.init();
     mobileDeEmbed();
