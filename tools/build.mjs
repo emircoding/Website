@@ -11,7 +11,7 @@ const V = { css: ver("assets/css/style.css"), config: ver("assets/js/config.js")
 // ★ EIGENE DOMAIN: hier eintragen, z. B. "https://automobilzentrum-nagold.de" (ohne / am Ende).
 // Dann stimmen Google-Adresse (canonical), Link-Vorschau-Bild (WhatsApp/Facebook) und Sitemap.
 // Leer = die Seite funktioniert unter jeder Adresse (z. B. pages.dev), nur ohne diese Extras.
-const SITE = "";
+const SITE = "https://automobilzentrumnagold.de";
 
 const I = {
   arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
