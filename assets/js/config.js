@@ -7,7 +7,7 @@
 window.AZN_CONFIG = {
   name: "Automobilzentrum Nagold",
   legalName: "",                              // Impressum: vollständiger Firmenname inkl. Rechtsform, z. B. "Automobilzentrum Nagold GmbH" oder "Max Mustermann e.K." (leer = name)
-  owner: "Inhaber: Max Mustermann",          // Impressum: "Inhaber: …" (Einzelunternehmen) bzw. "Geschäftsführer: …" (GmbH)
+  owner: "Inhaber: Omar Mohamed",          // Impressum: "Inhaber: …" (Einzelunternehmen) bzw. "Geschäftsführer: …" (GmbH)
   street: "Ferdinand-Porsche-Str. 20",
   zip: "72202",
   city: "Nagold",
