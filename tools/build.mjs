@@ -4,6 +4,7 @@
 import { writeFileSync, readFileSync, existsSync, unlinkSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
 const OUT = fileURLToPath(new URL("..", import.meta.url));
 // Versionsnummer je Datei (Inhalts-Hash) → Browser laden nach jeder Änderung sofort die neue Fassung
 const ver = (f) => createHash("sha1").update(readFileSync(OUT + f)).digest("hex").slice(0, 8);
@@ -634,10 +635,27 @@ const rel = (c, isIndex) => c
   .replaceAll('href="/site.webmanifest"', 'href="site.webmanifest"')
   .replaceAll('href="/#', isIndex ? 'href="#' : 'href="index.html#')
   .replaceAll('href="/"', 'href="index.html"');
+// Firmendaten aus assets/js/config.js direkt in die Seiten schreiben (Impressum & Co. stehen damit
+// auch ohne JavaScript, für Google und für Vorlese-Programme vollständig da; main.js setzt sie zusätzlich).
+const cfgBox = { window: {} };
+vm.runInNewContext(readFileSync(OUT + "assets/js/config.js", "utf8"), cfgBox);
+const C = cfgBox.window.AZN_CONFIG || {};
+const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const CFG = {
+  name: C.name, legalName: C.legalName || C.name, owner: C.owner, street: C.street, zipcity: `${C.zip || ""} ${C.city || ""}`.trim(),
+  phoneDisplay: C.phoneDisplay, email: C.email, vatId: C.vatId, register: C.register, year: String(new Date().getFullYear())
+};
+const HREF = { tel: "tel:" + C.phone, mail: "mailto:" + C.email, wa: "https://wa.me/" + C.whatsapp };
+const hasPlaceholders = /Muster|000 000|0000000/.test([C.owner, C.street, C.phone, C.phoneDisplay, C.whatsapp].join(" "));
+const prefill = (html) => html
+  .replace(/(data-cfg="(\w+)"[^>]*>)([^<]*)(<\/)/g, (m, open, k, old, close) => (CFG[k] ? open + esc(CFG[k]) + close : m))
+  .replace(/data-href="(tel|mail|wa)" href="#"/g, (m, k) => `data-href="${k}" href="${esc(HREF[k])}"`)
+  .replace(/(<[a-z]+ data-optional="(\w+)")/g, (m, open, k) => (C[k] && String(C[k]).trim() ? open : open + " hidden"))
+  .replace(/(<[a-z]+ class="notice" data-placeholder-notice)/g, (m, open) => (hasPlaceholders ? open : open + " hidden"));
 for (const [f, c] of Object.entries({ "index.html": index, "fahrzeuge.html": fahrzeuge, "impressum.html": impressum, "datenschutz.html": datenschutz })) {
-  writeFileSync(OUT + f, rel(c, f === "index.html"));
+  writeFileSync(OUT + f, prefill(rel(c, f === "index.html")));
 }
-writeFileSync(OUT + "404.html", notFound.replaceAll('href="fahrzeuge.html', 'href="/fahrzeuge.html').replaceAll('href="impressum.html', 'href="/impressum.html').replaceAll('href="datenschutz.html', 'href="/datenschutz.html'));
+writeFileSync(OUT + "404.html", prefill(notFound.replaceAll('href="fahrzeuge.html', 'href="/fahrzeuge.html').replaceAll('href="impressum.html', 'href="/impressum.html').replaceAll('href="datenschutz.html', 'href="/datenschutz.html')));
 
 // Favicon & manifest assets (SVG)
 writeFileSync(OUT + "assets/img/favicon.svg", `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="c" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#cfcfd3"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="#0b0b0c"/><g transform="translate(6 14) scale(.42)"><path fill="url(#c)" d="${SWOOSH1}"/><path fill="#8b8b91" d="${SWOOSH2}"/></g></svg>`);
