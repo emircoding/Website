@@ -61,10 +61,16 @@
     var maps = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.name + ", " + C.street + ", " + C.zip + " " + C.city);
     var G = C.google || {};
     var gprofile = G.profileUrl || maps;
-    var hrefs = { tel: "tel:" + C.phone, mail: "mailto:" + C.email, wa: "https://wa.me/" + C.whatsapp, maps: maps, mobilede: C.mobileDeUrl || mobileDeEmbedUrl() || "https://www.mobile.de/", gprofile: gprofile, greview: G.reviewUrl || gprofile };
+    var mde = C.mobileDeUrl || mobileDeEmbedUrl();
+    var hrefs = { tel: "tel:" + C.phone, mail: "mailto:" + C.email, wa: "https://wa.me/" + C.whatsapp, maps: maps, mobilede: mde, gprofile: gprofile, greview: G.reviewUrl || gprofile };
     document.querySelectorAll("[data-href]").forEach(function (el) {
       var h = hrefs[el.getAttribute("data-href")];
       if (h) el.setAttribute("href", h);
+      // Solange mobile.de nicht verbunden ist: keine Links auf die allgemeine mobile.de-Startseite zeigen
+      else if (el.getAttribute("data-href") === "mobilede") {
+        var hide = el.closest("li, .mde-frame__note") || el;
+        hide.hidden = true; hide.style.display = "none";
+      }
     });
     document.querySelectorAll("[data-hours]").forEach(function (el) {
       el.innerHTML = (C.hours || []).map(function (h) { return "<dt>" + h[0] + "</dt><dd>" + h[1] + "</dd>"; }).join("");
@@ -95,8 +101,12 @@
     if (!box) return;
     var st = box.querySelector(".mde-frame__state"), status = box.querySelector("[data-mde-status]"), url = mobileDeEmbedUrl();
     if (!url) {
-      st.insertAdjacentHTML("beforeend", "<p>Hier erscheint der komplette Fahrzeugbestand von mobile.de. Dafür einmal die mobile.de-Kunden-ID in <code>assets/js/config.js</code> eintragen.</p>");
-      if (status) status.textContent = "Noch nicht verbunden";
+      // Noch keine mobile.de-Kunden-ID in config.js → freundlicher Hinweis für Besucher statt leerem Rahmen
+      if (status) status.textContent = "Bestand folgt in Kürze";
+      st.insertAdjacentHTML("beforeend",
+        '<div class="mde-gate"><p>Unser aktueller Fahrzeugbestand erscheint hier in Kürze. Bis dahin sagen wir Ihnen gern persönlich, welche Fahrzeuge gerade bei uns stehen.</p>' +
+        '<a class="btn" href="' + "https://wa.me/" + C.whatsapp + '" target="_blank" rel="noopener">Per WhatsApp fragen</a>' +
+        '<a class="mde-gate__more" href="tel:' + C.phone + '">Oder anrufen: ' + C.phoneDisplay + '</a></div>');
       return;
     }
     function load() {
