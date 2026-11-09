@@ -53,7 +53,7 @@ Die Website funktioniert unter **jedem** Projektnamen – es ist nirgends eine f
 
 **Anderen pages.dev-Namen gewünscht?** Cloudflare kann Projekte nicht umbenennen. Stattdessen: neues Pages-Projekt mit dem Wunschnamen (z. B. `automobilzentrum-nagold`) aus demselben Repository anlegen (Schritte oben) und das alte Projekt unter *Settings → Delete project* löschen.
 
-**Eigene Domain** (z. B. `automobilzentrum-nagold.de`): im Projekt unter **Custom domains** hinzufügen. Danach die Domain in der Datei-Vorlage als feste Adresse hinterlegen lassen (für Google & Link-Vorschauen).
+**Eigene Domain** (z. B. `automobilzentrum-nagold.de`): siehe Abschnitt 6.
 
 ## 3. Firmendaten eintragen
 
@@ -99,14 +99,28 @@ In der gewählten App ist die E-Mail fertig vorbereitet (Empfänger, Betreff, fr
 Echte Werte in `assets/js/config.js` unter `google` eintragen (Note, Anzahl, Profil-Link, ausgewählte Bewertungen). Solange keine Note eingetragen ist, zeigt die Startseite einen Aufruf zum Bewerten.
 **Design-Vorschau nur für euch:** Startseite mit `?vorschau` am Ende der Adresse öffnen (z. B. `…pages.dev/?vorschau`) – zeigt deutlich markierte Beispielkarten. Besucher sehen das nie. (Erfundene Bewertungen dürfen nicht veröffentlicht werden – § 5b UWG / Anhang UWG.)
 
-## 6. Eigene Domain & Webhoster
+## 6. Eigene Domain
 
-1. Webhosting-Paket mit PHP bei einem Anbieter buchen (Domain meist inklusive).
-2. Alle Dateien per FTP in das Hauptverzeichnis der Domain hochladen.
-3. Beim Hoster das kostenlose SSL-Zertifikat (HTTPS) aktivieren; danach in `.htaccess` die zwei Zeilen „immer HTTPS“ aktivieren (Raute entfernen).
-4. In der **Datenschutzerklärung Abschnitt 3 (Hosting)** den neuen Anbieter statt Cloudflare eintragen (Bescheid geben, dann wird es angepasst).
+**Empfohlen: Domain kaufen, Website bleibt kostenlos bei Cloudflare** (nur Domainkosten, .de ca. 4–15 € im Jahr).
 
-`.htaccess` sorgt für Fehlerseite, Sicherheits-Header und kurze Adressen (`/fahrzeuge`). Die Datei `_headers` wird nur bei Cloudflare Pages genutzt und kann sonst ignoriert werden.
+1. **Domain kaufen**, z. B. bei INWX (inwx.de): Wunschnamen suchen, bestellen. Als Inhaber den Firmeninhaber bzw. die Firma eintragen.
+2. **Bei Cloudflare anmelden:** dash.cloudflare.com → „+ Hinzufügen“ → „Domain verbinden“ → Domain eingeben → Tarif **Free**. Cloudflare zeigt zwei Nameserver an (z. B. `anna.ns.cloudflare.com`, `bob.ns.cloudflare.com`).
+3. **Nameserver umstellen:** bei INWX → Domains → Domain → zuerst **DNSSEC ausschalten** (falls an) → Nameserver auf „Externe Nameserver“ → die zwei Cloudflare-Nameserver eintragen → speichern. Nach 10–60 Min. (selten bis 24 h) meldet Cloudflare per E-Mail „aktiv“.
+4. **An die Website hängen:** Cloudflare → Workers & Pages → Projekt → **Custom domains** → „Set up a custom domain“ → `automobilzentrum-nagold.de` → bestätigen. Dasselbe für `www.automobilzentrum-nagold.de`. HTTPS richtet Cloudflare automatisch ein.
+5. **www umleiten:** bei der Domain → **Rules** → Vorlage „Redirect from WWW to Root“ → speichern.
+6. **Domain fest eintragen:** in `tools/build.mjs` bei `SITE` die Adresse eintragen (z. B. `"https://automobilzentrum-nagold.de"`), dann `node tools/build.mjs` ausführen und hochladen. Damit stimmen Google-Adresse, Link-Vorschau-Bild (WhatsApp) und Sitemap.
+7. Optional: **E-Mail-Weiterleitung** (Cloudflare → Email → Email Routing), z. B. `info@…` → Gmail. Kostenlos.
+
+**Alternative: Webhosting-Paket mit PHP** (ca. 3–8 € im Monat, Domain und E-Mail-Postfächer meist inklusive). Nötig, wenn die Formulare direkt senden sollen (`formMode: "server"`, mit Foto-Upload und PDF).
+1. Paket buchen, alle Dateien per FTP in das Hauptverzeichnis der Domain hochladen.
+2. Kostenloses SSL-Zertifikat (HTTPS) aktivieren; danach in `.htaccess` die zwei Zeilen „immer HTTPS“ aktivieren (Raute entfernen).
+3. In der **Datenschutzerklärung Abschnitt 3 (Hosting)** den neuen Anbieter statt Cloudflare eintragen.
+
+`.htaccess` sorgt dort für Fehlerseite, Sicherheits-Header und kurze Adressen (`/fahrzeuge`). Die Datei `_headers` wird nur bei Cloudflare Pages genutzt.
+
+## Seiten neu erzeugen (für Entwickler)
+
+Die HTML-Seiten werden aus `tools/build.mjs` erzeugt (Texte, Impressum, Datenschutz, Kopf- und Fußzeile). Nach Änderungen dort oder an CSS/JS: `node tools/build.mjs` im Projektordner ausführen – die Dateien bekommen dabei automatisch neue Versionsnummern, damit Browser sofort die neue Fassung laden.
 
 ## Technik & Features
 
