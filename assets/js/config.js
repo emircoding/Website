@@ -51,13 +51,15 @@ window.AZN_CONFIG = {
   // Werte aus dem Google-Unternehmensprofil übernehmen. Solange rating 0 ist,
   // wird der Bewertungsbereich auf der Startseite ausgeblendet.
   google: {
-    rating: 0,          // Durchschnitt, z. B. 4.9
-    count: 0,           // Anzahl aller Bewertungen auf Google, z. B. 87
+    rating: 5.0,        // Durchschnitt, z. B. 4.9
+    count: 2,           // Anzahl aller Bewertungen auf Google, z. B. 87
     profileUrl: "https://share.google/aqHipZqco8hBPdQ9t", // Link zum Google-Profil (Google Maps → Teilen → Link kopieren). Leer = Google-Maps-Suche
     reviewUrl: "",      // Link „Bewertung schreiben“ (Google-Unternehmensprofil → „Bewertungen erhalten“). Leer = profileUrl
     reviews: [
       // Ausgewählte echte Bewertungen, z. B.:
       // { name: "Max M.", stars: 5, date: "Oktober 2026", text: "Sehr freundliche Beratung …" },
+      { name: "Ziko", stars: 5, date: "November 2026", text: "Ein wirklich hervorragendes Autohaus! Vom ersten Kontakt an fühlt man sich bestens aufgehoben. …" },
+      { name: "Simon", stars: 5, date: "November 2026", text: "Absolut empfehlenswert! Sehr freundliches und kompetentes Team, super Beratung und ein rundum reibungsloser Ablauf. …" },
     ]
   }
 };

@@ -392,7 +392,7 @@ ${header("")}
         </div>
       </div>
       <div class="reviews__track" data-reviews-track></div>
-      <p class="reviews__note">Ausgewählte Bewertungen aus unserem Google-Unternehmensprofil. Die Gesamtbewertung und Anzahl umfassen alle Bewertungen auf Google. Wir prüfen nicht selbst, ob die Bewertenden unsere Leistungen in Anspruch genommen haben; Google setzt hierfür eigene Prüfverfahren ein.</p>
+      <p class="reviews__note">Ausgewählte Bewertungen aus unserem Google-Unternehmensprofil. Die Gesamtbewertung und Anzahl umfassen alle Bewertungen auf Google. Die Bewertungen werden weder von uns noch von Google darauf geprüft, ob die Bewertenden unsere Leistungen tatsächlich in Anspruch genommen haben.</p>
     </div>
   </section>
 
