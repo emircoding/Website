@@ -53,7 +53,7 @@ window.AZN_CONFIG = {
   google: {
     rating: 0,          // Durchschnitt, z. B. 4.9
     count: 0,           // Anzahl aller Bewertungen auf Google, z. B. 87
-    profileUrl: "",     // Link zum Google-Profil (Google Maps → Teilen → Link kopieren). Leer = Google-Maps-Suche
+    profileUrl: "https://share.google/aqHipZqco8hBPdQ9t", // Link zum Google-Profil (Google Maps → Teilen → Link kopieren). Leer = Google-Maps-Suche
     reviewUrl: "",      // Link „Bewertung schreiben“ (Google-Unternehmensprofil → „Bewertungen erhalten“). Leer = profileUrl
     reviews: [
       // Ausgewählte echte Bewertungen, z. B.:
