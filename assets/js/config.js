@@ -36,10 +36,10 @@ window.AZN_CONFIG = {
 
   // Optional: Adresse Ihrer Händlerseite auf mobile.de (für „In neuem Tab öffnen“),
   // z. B. "https://home.mobile.de/AUTOMOBILZENTRUMNAGOLD". Leer = wird aus der Kunden-ID gebildet.
-  mobileDeUrl: "",
+  mobileDeUrl: "https://home.mobile.de/AutomobilzentrumNagold",
 
   // Optional (nur für Profis): komplett eigene Einbettungs-Adresse statt der Standard-Adresse.
-  mobileDeEmbed: "",
+  mobileDeEmbed: "https://home.mobile.de/AutomobilzentrumNagold",  // Händlerseite direkt eingebettet (alternativ: Kunden-ID oben eintragen und dieses Feld leeren)
 
   // ===== Formulare =====
   // "mail"   = Absenden öffnet ein Auswahl-Menü (Mail-App, Gmail, Outlook, WhatsApp) mit fertiger E-Mail.
