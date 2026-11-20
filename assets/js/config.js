@@ -29,17 +29,13 @@ window.AZN_CONFIG = {
   schedule: { mo: "08:00-18:00", di: "08:00-18:00", mi: "08:00-18:00", do: "08:00-18:00", fr: "08:00-18:00", sa: "09:00-17:00", so: "" },
 
   // ===== mobile.de =====
-  // Ihre Kunden-ID bei mobile.de (steht im mobile.de-Händlerbereich, z. B. "12345678").
-  // Sobald sie hier steht, zeigt die Seite „Fahrzeuge“ automatisch den kompletten
-  // Bestand von mobile.de – neue Fahrzeuge erscheinen sofort, verkaufte verschwinden.
-  mobileDeCustomerId: "",
-
-  // Optional: Adresse Ihrer Händlerseite auf mobile.de (für „In neuem Tab öffnen“),
-  // z. B. "https://home.mobile.de/AUTOMOBILZENTRUMNAGOLD". Leer = wird aus der Kunden-ID gebildet.
+  // Der Fahrzeugbestand auf der Seite „Fahrzeuge“ kommt automatisch live von mobile.de
+  // (über die mobile.de-Schnittstelle, siehe functions/api/fahrzeuge.js). Die Zugangsdaten
+  // stehen NICHT hier, sondern verschlüsselt in Cloudflare (MOBILE_DE_USER / MOBILE_DE_PASSWORD).
+  // Neue Inserate erscheinen automatisch, gelöschte/verkaufte verschwinden automatisch.
+  //
+  // Adresse Ihrer Händlerseite auf mobile.de (für Links „Auf mobile.de ansehen“):
   mobileDeUrl: "https://home.mobile.de/AutomobilzentrumNagold",
-
-  // Optional (nur für Profis): komplett eigene Einbettungs-Adresse statt der Standard-Adresse.
-  mobileDeEmbed: "https://home.mobile.de/AutomobilzentrumNagold",  // Händlerseite direkt eingebettet (alternativ: Kunden-ID oben eintragen und dieses Feld leeren)
 
   // ===== Formulare =====
   // "mail"   = Absenden öffnet ein Auswahl-Menü (Mail-App, Gmail, Outlook, WhatsApp) mit fertiger E-Mail.

@@ -26,7 +26,7 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="assets/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/style.css?v=0755ff38">
+<link rel="stylesheet" href="assets/css/style.css?v=ce8bab1b">
 </head>
 <body>
 
@@ -96,21 +96,25 @@
       </div>
     </div>
   </section>
-  <section class="container mde-section">
-    <div class="mde-frame" data-reveal="scale">
-      <div class="mde-frame__bar">
-        <span class="mde-frame__dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="mde-frame__live"><i></i>Von mobile.de</span>
-        <a class="mde-frame__open" data-href="mobilede" href="#" target="_blank" rel="noopener"><span class="hide-sm">In neuem Tab&nbsp;</span>öffnen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
-      </div>
-      <div class="mde-frame__body" data-mde-embed>
-        <div class="mde-frame__state">
-          <span class="mde__logo">mobile<b>.de</b></span>
-          <span class="mde__txt" data-mde-status>Bestand wird geladen …</span>
-        </div>
+  <section class="container stock-section" data-stock>
+    <div class="stock-bar">
+      <div class="stock-bar__count"><span class="mde-frame__live"><i></i>Live von mobile.de</span><strong data-stock-count>Bestand wird geladen …</strong></div>
+      <div class="stock-bar__tools" hidden>
+        <label class="stock-select"><span class="sr-only">Marke</span><select data-stock-make></select></label>
+        <label class="stock-select"><span class="sr-only">Kraftstoff</span><select data-stock-fuel></select></label>
+        <label class="stock-select"><span class="sr-only">Sortierung</span><select data-stock-sort>
+          <option value="new">Neueste zuerst</option>
+          <option value="price-asc">Preis aufsteigend</option>
+          <option value="price-desc">Preis absteigend</option>
+          <option value="km-asc">Kilometer aufsteigend</option>
+          <option value="year-desc">Erstzulassung: neueste</option>
+        </select></label>
       </div>
     </div>
-    <p class="mde-frame__note">Bestand wird nicht angezeigt? <a data-href="mobilede" href="#" target="_blank" rel="noopener">Direkt auf mobile.de ansehen</a></p>
+    <div class="cars is-loading" data-stock-grid aria-live="polite" aria-busy="false">
+      <div class="car car--skel" style="--i:0" aria-hidden="true"><span class="car__media"></span><span class="car__body"><i></i><i></i><i></i></span></div><div class="car car--skel" style="--i:1" aria-hidden="true"><span class="car__media"></span><span class="car__body"><i></i><i></i><i></i></span></div><div class="car car--skel" style="--i:2" aria-hidden="true"><span class="car__media"></span><span class="car__body"><i></i><i></i><i></i></span></div><div class="car car--skel" style="--i:3" aria-hidden="true"><span class="car__media"></span><span class="car__body"><i></i><i></i><i></i></span></div><div class="car car--skel" style="--i:4" aria-hidden="true"><span class="car__media"></span><span class="car__body"><i></i><i></i><i></i></span></div><div class="car car--skel" style="--i:5" aria-hidden="true"><span class="car__media"></span><span class="car__body"><i></i><i></i><i></i></span></div>
+    </div>
+    <p class="stock-note">Alle Angaben ohne Gewähr – Irrtümer, Änderungen und Zwischenverkauf vorbehalten. Der Bestand wird automatisch mit mobile.de abgeglichen. <a data-href="mobilede" href="#" target="_blank" rel="noopener">Händlerseite auf mobile.de</a></p>
   </section>
   <section class="cta-band dark">
     <div class="container">
@@ -163,13 +167,14 @@
     <div class="footer__giant" aria-hidden="true" data-parallax="-0.06">NAGOLD</div>
     <div class="footer__bottom">
       <span>© <span data-cfg="year">2026</span> <span data-cfg="name">Automobilzentrum Nagold</span>. Alle Rechte vorbehalten.</span>
-      <span><a href="impressum.html">Impressum</a> &nbsp;·&nbsp; <a href="datenschutz.html">Datenschutz</a> &nbsp;·&nbsp; <button type="button" data-consent-open>Cookie-Einstellungen</button></span>
+      <span><a href="impressum.html">Impressum</a> &nbsp;·&nbsp; <a href="datenschutz.html">Datenschutz</a></span>
     </div>
   </div>
 </footer>
 <a class="fab" data-href="wa" href="https://wa.me/4915901484988" target="_blank" rel="noopener" aria-label="WhatsApp schreiben"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4" stroke-linecap="round"/></svg></a>
 
-<script src="assets/js/config.js?v=0228299d"></script>
-<script src="assets/js/main.js?v=d59df514"></script>
+<script src="assets/js/config.js?v=148cf331"></script>
+<script src="assets/js/main.js?v=6ecae339"></script>
+<script src="assets/js/bestand.js?v=b58b0e92" defer></script>
 </body>
 </html>

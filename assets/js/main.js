@@ -61,7 +61,7 @@
     var maps = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.name + ", " + C.street + ", " + C.zip + " " + C.city);
     var G = C.google || {};
     var gprofile = G.profileUrl || maps;
-    var mde = C.mobileDeUrl || mobileDeEmbedUrl();
+    var mde = C.mobileDeUrl || "";
     var hrefs = { tel: "tel:" + C.phone, mail: "mailto:" + C.email, wa: "https://wa.me/" + C.whatsapp, maps: maps, mobilede: mde, gprofile: gprofile, greview: G.reviewUrl || gprofile };
     document.querySelectorAll("[data-href]").forEach(function (el) {
       var h = hrefs[el.getAttribute("data-href")];
@@ -90,118 +90,8 @@
     }
   }
 
-  /* ---------- mobile.de: kompletter Bestand eingebettet ---------- */
-  function mobileDeEmbedUrl() {
-    if (C.mobileDeEmbed) return C.mobileDeEmbed;
-    var id = String(C.mobileDeCustomerId || "").trim();
-    return id ? "https://home.mobile.de/home/index.html?partnerHead=false&colorTheme=default&customerId=" + encodeURIComponent(id) : "";
-  }
-  function mobileDeEmbed() {
-    var box = document.querySelector("[data-mde-embed]");
-    if (!box) return;
-    var st = box.querySelector(".mde-frame__state"), status = box.querySelector("[data-mde-status]"), url = mobileDeEmbedUrl();
-    if (!url) {
-      // Noch keine mobile.de-Kunden-ID in config.js → freundlicher Hinweis für Besucher statt leerem Rahmen
-      if (status) status.textContent = "Bestand folgt in Kürze";
-      st.insertAdjacentHTML("beforeend",
-        '<div class="mde-gate"><p>Unser aktueller Fahrzeugbestand erscheint hier in Kürze. Bis dahin sagen wir Ihnen gern persönlich, welche Fahrzeuge gerade bei uns stehen.</p>' +
-        '<a class="btn" href="' + "https://wa.me/" + C.whatsapp + '" target="_blank" rel="noopener">Per WhatsApp fragen</a>' +
-        '<a class="mde-gate__more" href="tel:' + C.phone + '">Oder anrufen: ' + C.phoneDisplay + '</a></div>');
-      return;
-    }
-    function load() {
-      if (box.querySelector("iframe")) return;
-      var gate = st.querySelector(".mde-gate");
-      if (gate) gate.remove();
-      if (status) status.textContent = "Bestand wird geladen …";
-      var f = document.createElement("iframe");
-      f.src = url;
-      f.title = "Fahrzeugbestand auf mobile.de";
-      f.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
-      f.setAttribute("allow", "fullscreen; clipboard-write");
-      f.addEventListener("load", function () { box.classList.add("is-loaded"); });
-      box.appendChild(f);
-      setTimeout(function () { if (!box.classList.contains("is-loaded") && status) status.textContent = "Lädt länger als üblich …"; }, 8000);
-    }
-    if (consent.get().external) return load();
-    // Ohne Zustimmung: erst auf Klick laden (Datenschutz)
-    if (status) status.textContent = "Ihre Zustimmung wird benötigt";
-    st.insertAdjacentHTML("beforeend",
-      '<div class="mde-gate"><p>Zum Schutz Ihrer Daten wird der Bestand von mobile.de erst nach Ihrer Zustimmung geladen. Dabei werden Daten (z. B. Ihre IP-Adresse) an mobile.de übertragen.</p>' +
-      '<button class="btn" type="button" data-gate-load>Bestand von mobile.de laden</button>' +
-      '<a class="mde-gate__more" href="datenschutz.html">Mehr in der Datenschutzerklärung</a></div>');
-    st.querySelector("[data-gate-load]").addEventListener("click", function () {
-      consent.set({ external: true });
-      load();
-    });
-    document.addEventListener("azn:consent", function () { if (consent.get().external) load(); });
-  }
-
-  /* ---------- Cookie-/Einwilligungs-Banner ---------- */
-  var consent = (function () {
-    var KEY = "azn-consent", VERSION = 1, mem = null;
-    function get() {
-      if (mem) return mem;
-      try { var v = JSON.parse(localStorage.getItem(KEY) || "null"); if (v && v.v === VERSION) return (mem = v); } catch (e) { /* ok */ }
-      return { v: VERSION, external: false, decided: false };
-    }
-    function set(o) {
-      mem = { v: VERSION, external: !!o.external, decided: true, ts: new Date().toISOString() };
-      try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) { /* privat-modus: gilt für diese Seite */ }
-      document.dispatchEvent(new CustomEvent("azn:consent"));
-    }
-    var el;
-    function build() {
-      el = document.createElement("div");
-      el.className = "consent";
-      el.setAttribute("role", "dialog");
-      el.setAttribute("aria-live", "polite");
-      el.setAttribute("aria-label", "Cookie-Einstellungen");
-      el.innerHTML =
-        '<div class="consent__head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 12.5A9 9 0 1 1 11.5 3a3 3 0 0 0 3.5 3.5 3 3 0 0 0 3.5 3.5 3 3 0 0 0 2.5 2.5z"/><circle cx="8.5" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="15.5" r="1" fill="currentColor"/><circle cx="16" cy="13" r=".8" fill="currentColor"/><circle cx="8" cy="15" r=".6" fill="currentColor"/></svg><strong>Cookies &amp; Datenschutz</strong></div>' +
-        '<p class="consent__text">Wir verwenden nur technisch notwendige Speicherungen. Für die Anzeige unseres Fahrzeugbestands binden wir Inhalte von <b>mobile.de</b> ein – dabei kann mobile.de Cookies setzen und Daten wie Ihre IP-Adresse erhalten. Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a> und im <a href="impressum.html">Impressum</a>.</p>' +
-        '<div class="consent__details" hidden>' +
-        '<label class="consent__opt"><span><b>Notwendig</b><small>Speichert Ihre Auswahl und sorgt für die Grundfunktionen der Seite.</small></span><input type="checkbox" checked disabled><i class="switch"></i></label>' +
-        '<label class="consent__opt"><span><b>Externe Inhalte – mobile.de</b><small>Zeigt unseren kompletten Fahrzeugbestand direkt von mobile.de an.</small></span><input type="checkbox" data-opt="external"><i class="switch"></i></label>' +
-        "</div>" +
-        '<div class="consent__actions"><button class="btn btn--light" type="button" data-c="all">Alle akzeptieren</button><button class="btn btn--ghost" type="button" data-c="necessary">Nur notwendige</button></div>' +
-        '<button class="consent__more" type="button" data-c="toggle">Einstellungen</button>';
-      document.body.appendChild(el);
-      var details = el.querySelector(".consent__details"), more = el.querySelector("[data-c=toggle]"), opt = el.querySelector("[data-opt=external]");
-      el.addEventListener("click", function (e) {
-        var b = e.target.closest("[data-c]"); if (!b) return;
-        var c = b.getAttribute("data-c");
-        if (c === "all") { set({ external: true }); close(); }
-        else if (c === "necessary") { set({ external: false }); close(); }
-        else if (c === "save") { set({ external: opt.checked }); close(); }
-        else if (c === "toggle") {
-          details.hidden = false;
-          opt.checked = get().external;
-          more.textContent = "Auswahl speichern";
-          more.setAttribute("data-c", "save");
-          more.classList.add("is-save");
-        }
-      });
-    }
-    function open(expanded) {
-      if (!el) build();
-      if (expanded) el.querySelector("[data-c=toggle]") && el.querySelector("[data-c=toggle]").click();
-      document.body.classList.add("consent-open");
-      requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("is-open"); }); });
-    }
-    function close() {
-      if (!el) return;
-      el.classList.remove("is-open");
-      document.body.classList.remove("consent-open");
-    }
-    function init() {
-      document.querySelectorAll("[data-consent-open]").forEach(function (a) {
-        a.addEventListener("click", function (e) { e.preventDefault(); open(true); });
-      });
-      if (!get().decided) setTimeout(function () { open(false); }, document.querySelector(".preloader") ? 1900 : 600);
-    }
-    return { get: get, set: set, init: init, open: open };
-  })();
+  /* Früheres Cookie-Banner wird nicht mehr benötigt (keine Drittanbieter-Inhalte mehr) → alte Auswahl aufräumen */
+  try { localStorage.removeItem("azn-consent"); } catch (e) { /* ok */ }
 
   /* ---------- Preloader (nur beim ersten Besuch pro Sitzung) ---------- */
   function preloader(done) {
@@ -988,8 +878,6 @@
     applyConfig();
     bgLines();
     reviews();
-    consent.init();
-    mobileDeEmbed();
     splitHeadings();
     prepStatement();
     plx = Array.prototype.slice.call(document.querySelectorAll("[data-parallax]"));
