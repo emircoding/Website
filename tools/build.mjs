@@ -8,7 +8,7 @@ import vm from "node:vm";
 const OUT = fileURLToPath(new URL("..", import.meta.url));
 // Versionsnummer je Datei (Inhalts-Hash) → Browser laden nach jeder Änderung sofort die neue Fassung
 const ver = (f) => createHash("sha1").update(readFileSync(OUT + f)).digest("hex").slice(0, 8);
-const V = { css: ver("assets/css/style.css"), config: ver("assets/js/config.js"), main: ver("assets/js/main.js"), bestand: ver("assets/js/bestand.js") };
+const V = { css: ver("assets/css/style.css"), config: ver("assets/js/config.js"), main: ver("assets/js/main.js") };
 // ★ EIGENE DOMAIN: hier eintragen, z. B. "https://automobilzentrum-nagold.de" (ohne / am Ende).
 // Dann stimmen Google-Adresse (canonical), Link-Vorschau-Bild (WhatsApp/Facebook) und Sitemap.
 // Leer = die Seite funktioniert unter jeder Adresse (z. B. pages.dev), nur ohne diese Extras.
@@ -160,16 +160,15 @@ const footer = `
     <div class="footer__giant" aria-hidden="true" data-parallax="-0.06">NAGOLD</div>
     <div class="footer__bottom">
       <span>© <span data-cfg="year"></span> <span data-cfg="name"></span>. Alle Rechte vorbehalten.</span>
-      <span><a href="impressum.html">Impressum</a> &nbsp;·&nbsp; <a href="datenschutz.html">Datenschutz</a></span>
+      <span><a href="impressum.html">Impressum</a> &nbsp;·&nbsp; <a href="datenschutz.html">Datenschutz</a> &nbsp;·&nbsp; <button type="button" data-consent-open>Cookie-Einstellungen</button></span>
     </div>
   </div>
 </footer>
 <a class="fab" data-href="wa" href="#" target="_blank" rel="noopener" aria-label="WhatsApp schreiben">${I.chat}</a>`;
 
-const scripts = (inv, stock) => `
+const scripts = (inv) => `
 <script src="/assets/js/config.js?v=${V.config}"></script>
-<script src="/assets/js/main.js?v=${V.main}"></script>${stock ? `
-<script src="/assets/js/bestand.js?v=${V.bestand}" defer></script>` : ""}
+<script src="/assets/js/main.js?v=${V.main}"></script>
 </body>
 </html>
 `;
@@ -269,10 +268,9 @@ ${header("")}
         <div class="mde-frame__bar">
           <span class="mde-frame__dots" aria-hidden="true"><i></i><i></i><i></i></span>
           <span class="mde-frame__live"><i></i>Von mobile.de</span>
-          <span class="stock__total" data-stock-total hidden></span>
           <span class="stock__brand">mobile<b>.de</b></span>
         </div>
-        <div class="stock__rows" data-stock-teaser aria-hidden="true">
+        <div class="stock__rows" aria-hidden="true">
           ${[0, 1, 2, 3].map((i) => `<div class="stock__row" style="--i:${i}"><span class="stock__thumb"></span><span class="stock__lines"><i></i><i></i><i></i></span><span class="stock__price"></span></div>`).join("")}
         </div>
       </a>
@@ -447,7 +445,7 @@ ${header("")}
   </section>
 </main>
 ${footer}
-${scripts(false, true)}`;
+${scripts(false)}`;
 
 /* ============================ FAHRZEUGE ============================ */
 const fahrzeuge = `${head({ title: "Fahrzeugbestand – Automobilzentrum Nagold", desc: "Der komplette Fahrzeugbestand des Automobilzentrum Nagold – von mobile.de, immer aktuell. Jetzt Wunschauto finden und anfragen.", path: "/fahrzeuge" })}
@@ -469,25 +467,21 @@ ${header("fahrzeuge")}
       </div>
     </div>
   </section>
-  <section class="container stock-section" data-stock>
-    <div class="stock-bar">
-      <div class="stock-bar__count"><span class="mde-frame__live"><i></i>Live von mobile.de</span><strong data-stock-count>Bestand wird geladen …</strong></div>
-      <div class="stock-bar__tools" hidden>
-        <label class="stock-select"><span class="sr-only">Marke</span><select data-stock-make></select></label>
-        <label class="stock-select"><span class="sr-only">Kraftstoff</span><select data-stock-fuel></select></label>
-        <label class="stock-select"><span class="sr-only">Sortierung</span><select data-stock-sort>
-          <option value="new">Neueste zuerst</option>
-          <option value="price-asc">Preis aufsteigend</option>
-          <option value="price-desc">Preis absteigend</option>
-          <option value="km-asc">Kilometer aufsteigend</option>
-          <option value="year-desc">Erstzulassung: neueste</option>
-        </select></label>
+  <section class="container mde-section">
+    <div class="mde-frame" data-reveal="scale">
+      <div class="mde-frame__bar">
+        <span class="mde-frame__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="mde-frame__live"><i></i>Von mobile.de</span>
+        <a class="mde-frame__open" data-href="mobilede" href="#" target="_blank" rel="noopener"><span class="hide-sm">In neuem Tab&nbsp;</span>öffnen ${I.ext}</a>
+      </div>
+      <div class="mde-frame__body" data-mde-embed>
+        <div class="mde-frame__state">
+          <span class="mde__logo">mobile<b>.de</b></span>
+          <span class="mde__txt" data-mde-status>Bestand wird geladen …</span>
+        </div>
       </div>
     </div>
-    <div class="cars is-loading" data-stock-grid aria-live="polite" aria-busy="false">
-      ${[0, 1, 2, 3, 4, 5].map((i) => `<div class="car car--skel" style="--i:${i}" aria-hidden="true"><span class="car__media"></span><span class="car__body"><i></i><i></i><i></i></span></div>`).join("")}
-    </div>
-    <p class="stock-note">Alle Angaben ohne Gewähr – Irrtümer, Änderungen und Zwischenverkauf vorbehalten. Der Bestand wird automatisch mit mobile.de abgeglichen. <a data-href="mobilede" href="#" target="_blank" rel="noopener">Händlerseite auf mobile.de</a></p>
+    <p class="mde-frame__note">Bestand wird nicht angezeigt? <a data-href="mobilede" href="#" target="_blank" rel="noopener">Direkt auf mobile.de ansehen</a></p>
   </section>
   <section class="cta-band dark">
     <div class="container">
@@ -501,7 +495,7 @@ ${header("fahrzeuge")}
   </section>
 </main>
 ${footer}
-${scripts(false, true)}`;
+${scripts(false)}`;
 
 /* ============================ LEGAL ============================ */
 const legalPage = (title, path, h1, body) => `${head({ title: `${title} – Automobilzentrum Nagold`, desc: `${title} des Automobilzentrum Nagold.`, path })}
@@ -560,17 +554,18 @@ const datenschutz = legalPage("Datenschutz", "/datenschutz", "Datenschutz", `
   <p>Diese Website wird bei Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA, über den Dienst „Cloudflare Pages“ gehostet. Beim Aufruf der Website werden technisch notwendige Daten verarbeitet, insbesondere IP-Adresse, Datum und Uhrzeit des Abrufs, aufgerufene Seite, Referrer-URL sowie Browser- und Betriebssystemangaben. Dies ist erforderlich, um die Website auszuliefern, ihre Stabilität und Sicherheit zu gewährleisten und Angriffe abzuwehren. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; unser berechtigtes Interesse liegt im sicheren und zuverlässigen Betrieb der Website.</p>
   <p>Mit Cloudflare besteht ein Vertrag zur Auftragsverarbeitung (Art. 28 DSGVO). Eine Übermittlung in die USA ist möglich; Cloudflare ist unter dem EU-US Data Privacy Framework zertifiziert, auf dessen Grundlage ein Angemessenheitsbeschluss der EU-Kommission besteht (Art. 45 DSGVO). Weitere Informationen: <a href="https://www.cloudflare.com/de-de/privacypolicy/" target="_blank" rel="noopener">Datenschutzerklärung von Cloudflare</a>.</p>
 
-  <h2>4. Cookies und lokaler Speicher</h2>
-  <p>Wir setzen keine Cookies und keine Analyse-, Tracking- oder Werbedienste ein. Auf unserer Website wird lediglich folgende Information in Ihrem Browser gespeichert:</p>
+  <h2>4. Cookies, lokaler Speicher und Einwilligung</h2>
+  <p>Wir selbst setzen keine Analyse-, Tracking- oder Werbe-Cookies ein. Auf unserer Website werden lediglich folgende Informationen in Ihrem Browser gespeichert:</p>
   <ul>
+    <li><strong>Ihre Cookie-Auswahl</strong> (localStorage, Eintrag „azn-consent“): damit das Hinweisfenster nicht bei jedem Besuch erneut erscheint. Gespeichert bis zur Änderung Ihrer Auswahl oder bis Sie Ihre Browserdaten löschen.</li>
     <li><strong>Startanimation</strong> (sessionStorage, Eintrag „azn-intro“): damit die Startanimation nur einmal pro Besuch abgespielt wird. Wird beim Schließen des Browsers gelöscht.</li>
   </ul>
-  <p>Diese Speicherung ist für den von Ihnen gewünschten Dienst unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG) und verlässt Ihr Gerät nicht. Eine Einwilligung ist dafür nicht erforderlich.</p>
+  <p>Diese Speicherungen sind für den von Ihnen gewünschten Dienst unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG) und verlassen Ihr Gerät nicht. Inhalte von Drittanbietern (mobile.de) laden wir nur mit Ihrer Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie beim ersten Besuch über unser Hinweisfenster erteilen oder ablehnen können.</p>
+  <p><strong>Widerruf:</strong> Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen oder ändern – über den Link <button type="button" class="inline-link" data-consent-open>„Cookie-Einstellungen“</button>, der am Ende jeder Seite zu finden ist. Die Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung bleibt unberührt (Art. 7 Abs. 3 DSGVO).</p>
 
   <h2>5. Fahrzeugbestand von mobile.de</h2>
-  <p>Unsere Fahrzeugangebote verwalten wir bei mobile.de (mobile.de GmbH). Auf den Seiten „Startseite“ und „Fahrzeuge“ zeigen wir diese Angebote an. Dazu ruft <strong>unser Server</strong> die Fahrzeugdaten und -fotos über die Schnittstelle von mobile.de ab und liefert sie über unsere eigene Domain aus. Ihr Browser stellt dabei <strong>keine Verbindung zu mobile.de</strong> her; an mobile.de werden keine Daten von Ihnen übermittelt.</p>
-  <p>Erst wenn Sie einen Link wie „Inserat auf mobile.de ansehen“ anklicken, wechseln Sie auf die Website von mobile.de. Dann gilt die <a href="https://www.mobile.de/service/privacyPolicy" target="_blank" rel="noopener">Datenschutzerklärung von mobile.de</a>.</p>
-  <p>Wenn Sie ein Fahrzeug über die Schaltfläche „Per WhatsApp anfragen“ anfragen, öffnet sich WhatsApp mit einem vorbereiteten Text; gesendet wird erst, wenn Sie selbst auf „Senden“ tippen (siehe Abschnitt 7 „WhatsApp“).</p>
+  <p>Auf der Seite „Fahrzeuge“ binden wir unseren Fahrzeugbestand direkt von mobile.de ein. Anbieter ist die mobile.de GmbH (Anschrift und Kontakt siehe <a href="https://www.mobile.de/service/privacyPolicy" target="_blank" rel="noopener">Datenschutzerklärung von mobile.de</a>).</p>
+  <p>Der Bestand wird <strong>nur geladen, wenn Sie eingewilligt haben</strong> – entweder über „Alle akzeptieren“ bzw. die Einstellungen im Hinweisfenster oder über die Schaltfläche „Bestand von mobile.de laden“. Ohne Einwilligung wird keine Verbindung zu mobile.de hergestellt. Nach Ihrer Einwilligung stellt Ihr Browser eine Verbindung zu Servern von mobile.de her; dabei werden insbesondere Ihre IP-Adresse, Browserinformationen sowie die aufgerufene Seite an mobile.de übermittelt, und mobile.de kann Cookies oder ähnliche Technologien einsetzen. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG). Für die weitere Verarbeitung ist mobile.de verantwortlich.</p>
 
   <h2>6. Kontaktaufnahme</h2>
   <p>Wenn Sie uns per E-Mail oder Telefon kontaktieren, verarbeiten wir Ihre Angaben (z. B. Name, Kontaktdaten, Inhalt Ihrer Anfrage, Angaben zu einem Fahrzeug) zur Bearbeitung Ihrer Anfrage. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, soweit Ihre Anfrage auf einen Vertrag (z. B. Fahrzeugkauf, Ankauf, Finanzierung) gerichtet ist, im Übrigen Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Beantwortung von Anfragen).</p>

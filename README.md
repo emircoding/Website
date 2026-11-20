@@ -62,27 +62,25 @@ Einmal dort ändern → alle Seiten, Footer, Impressum, Buttons übernehmen es a
 
 ⚠️ **Vor dem offiziellen Start:** echte Daten eintragen – vor allem `legalName` (Firmenname mit Rechtsform), `owner`, Adresse, Telefon, `vatId` und ggf. `register` (Handelsregister). Solange Platzhalter drin sind, zeigen Impressum und Datenschutz einen gelben Hinweis; er verschwindet automatisch, sobald echte Daten eingetragen sind. Leere Felder (z. B. USt-IdNr.) werden im Impressum automatisch ausgeblendet.
 
-**Rechtliches – bereits umgesetzt:** Impressum nach § 5 DDG (ohne den seit 20.07.2025 abgeschafften OS-Plattform-Link), ausführliche Datenschutzerklärung nach Art. 13 DSGVO, keine Cookies und kein Cookie-Banner nötig (mobile.de-Daten und -Fotos kommen über den eigenen Server, der Browser verbindet sich nicht mit mobile.de), Schriften lokal (Lizenzen in `assets/fonts/`), kein Tracking.
-In Cloudflare **keine „Web Analytics“ aktivieren**, ohne vorher Datenschutzerklärung und Einwilligung anzupassen.
+**Rechtliches – bereits umgesetzt:** Impressum nach § 5 DDG (ohne den seit 20.07.2025 abgeschafften OS-Plattform-Link), ausführliche Datenschutzerklärung nach Art. 13 DSGVO, Cookie-Banner mit gleichwertiger Ablehnen-Option und Widerruf über „Cookie-Einstellungen“ im Footer, mobile.de wird erst nach Einwilligung geladen, Schriften lokal (Lizenzen in `assets/fonts/`), kein Tracking.
+In Cloudflare **keine „Web Analytics“ aktivieren**, ohne die Datenschutzerklärung und den Cookie-Banner anzupassen.
 
 ## 4. mobile.de verbinden (Bestand)
 
-Die Seite **Fahrzeuge** zeigt den kompletten Bestand **live von mobile.de** – in eigenen Fahrzeugkarten mit Fotos, Preis, Filter (Marke, Kraftstoff), Sortierung und einer Detailansicht mit Fotogalerie, Ausstattung, Beschreibung und „Per WhatsApp anfragen“. Die Startseite zeigt die neuesten Fahrzeuge als Vorschau.
-
-Alles synchronisiert sich automatisch: **Neue Inserate erscheinen, gelöschte/verkaufte verschwinden** – spätestens nach 10 Minuten. Auf der Website muss nie etwas gepflegt werden.
-
-**So funktioniert es:** `functions/api/fahrzeuge.js` (Cloudflare Pages Function) fragt die offizielle **mobile.de Search-API** („Inserats-Einbindung“) ab und speichert das Ergebnis 10 Minuten zwischen. Fotos laufen über `functions/api/bild.js` über die eigene Domain. Ist mobile.de kurz nicht erreichbar, wird der letzte bekannte Stand gezeigt. Ohne Zugangsdaten zeigt die Seite automatisch einen Button „Bestand auf mobile.de“.
+Die Seite **Fahrzeuge** zeigt oben das eigene Design und darunter den **kompletten Bestand direkt von mobile.de** (eingebettet).
+Alles synchronisiert sich automatisch: Neue Inserate erscheinen sofort, Änderungen und Fotos werden übernommen, verkaufte Fahrzeuge verschwinden – auf der Website muss nie etwas gepflegt werden.
 
 **Einrichtung (einmalig):**
-1. Im **mobile.de-Händlerbereich** den API-Zugang für die Inserats-Einbindung aktivieren und einen API-Benutzer (Benutzername + Passwort) anlegen. Findet man es nicht: beim mobile.de-Händlerservice „Zugang zur Search-API / Inserats-Einbindung für unsere eigene Website“ anfragen.
-2. In **Cloudflare → Workers & Pages → automobilzentrum-nagold → Einstellungen → Variablen und Geheimnisse** für **Production** anlegen (Typ **Secret / verschlüsseln**):
-   - `MOBILE_DE_USER` – API-Benutzername
-   - `MOBILE_DE_PASSWORD` – API-Passwort
-   - `MOBILE_DE_CUSTOMER_NUMBER` – (empfohlen) Kundennummer des Händlers bei mobile.de
-3. **Deployments → neuestes Deployment → „Retry deployment“** (damit die Variablen aktiv werden).
-4. Prüfen: `https://automobilzentrumnagold.de/api/fahrzeuge` aufrufen – dort muss `"ok":true` stehen.
+1. Im mobile.de-Händlerbereich die **Kunden-ID** heraussuchen (Verwaltung / Stammdaten).
+2. In `assets/js/config.js` eintragen: `mobileDeCustomerId: "12345678",`
+3. Optional bei `mobileDeUrl` die Adresse der eigenen Händlerseite eintragen (für „In neuem Tab öffnen“).
+4. Speichern und hochladen – fertig.
 
-Die Zugangsdaten stehen **nie** im Code oder auf GitHub.
+Eingebunden wird die offizielle Händler-Einbindung von mobile.de:
+`https://home.mobile.de/home/index.html?partnerHead=false&colorTheme=default&customerId=KUNDEN-ID`
+Falls mobile.de Ihnen im Händlerbereich einen anderen Einbindungs-Link nennt, diesen bei `mobileDeEmbed` in `config.js` eintragen.
+
+Auf der Startseite gibt es dazu einen animierten Teaser „Unser Bestand – live von mobile.de“, der auf die Fahrzeugseite führt.
 
 ## 5. Formulare (Einstellung `formMode` in config.js)
 
@@ -137,4 +135,4 @@ Die HTML-Seiten werden aus `tools/build.mjs` erzeugt (Texte, Impressum, Datensch
 - „Jetzt geöffnet“-Anzeige anhand der Öffnungszeiten
 - iPhone: Safe-Area (Notch/Dynamic Island), kein Auto-Zoom bei Formularen, Homescreen-Icon, flüssiges Scrollen
 - Barrierearm: Tastaturbedienung, `prefers-reduced-motion` wird respektiert
-- DSGVO: eigene Seite ohne Cookies und Tracking, Schriften lokal, mobile.de-Bestand wird serverseitig geladen (in der Datenschutzerklärung beschrieben)
+- DSGVO: eigene Seite ohne Cookies und Tracking, Schriften lokal (die eingebettete mobile.de-Seite ist in der Datenschutzerklärung erwähnt)
