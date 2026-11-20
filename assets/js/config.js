@@ -29,17 +29,20 @@ window.AZN_CONFIG = {
   schedule: { mo: "08:00-18:00", di: "08:00-18:00", mi: "08:00-18:00", do: "08:00-18:00", fr: "08:00-18:00", sa: "09:00-17:00", so: "" },
 
   // ===== mobile.de =====
-  // Ihre Kunden-ID bei mobile.de (steht im mobile.de-Händlerbereich, z. B. "12345678").
-  // Sobald sie hier steht, zeigt die Seite „Fahrzeuge“ automatisch den kompletten
-  // Bestand von mobile.de – neue Fahrzeuge erscheinen sofort, verkaufte verschwinden.
+  // Die Seite „Fahrzeuge“ zeigt den kompletten Bestand in einem mobile.de-Fenster.
+  // Neue Fahrzeuge erscheinen dort automatisch, verkaufte verschwinden automatisch.
+  //
+  // Kunden-ID (meist 8-stellig) – SO FINDEN: home.mobile.de/AutomobilzentrumNagold im Browser öffnen,
+  // auf „Über uns“ / „Impressum“ / ein Fahrzeug tippen → in der Adresszeile steht "customerId=12345678".
+  // Hier die Zahl eintragen (oder einfach die ganze Adresse mit customerId=… hineinkopieren).
   mobileDeCustomerId: "",
 
-  // Optional: Adresse Ihrer Händlerseite auf mobile.de (für „In neuem Tab öffnen“),
-  // z. B. "https://home.mobile.de/AUTOMOBILZENTRUMNAGOLD". Leer = wird aus der Kunden-ID gebildet.
+  // Adresse der Händlerseite auf mobile.de (für „In neuem Tab öffnen“ / „Direkt auf mobile.de ansehen“)
   mobileDeUrl: "https://home.mobile.de/AutomobilzentrumNagold",
 
-  // Optional (nur für Profis): komplett eigene Einbettungs-Adresse statt der Standard-Adresse.
-  mobileDeEmbed: "https://home.mobile.de/AutomobilzentrumNagold",  // Händlerseite direkt eingebettet (alternativ: Kunden-ID oben eintragen und dieses Feld leeren)
+  // Nur falls KEINE Kunden-ID eingetragen ist: diese Adresse wird im Fenster gezeigt
+  // (z. B. der „Bestandslink“ aus dem mobile.de-Händlerbereich unter „Inseratseinbindung“).
+  mobileDeEmbed: "https://home.mobile.de/AutomobilzentrumNagold",
 
   // ===== Formulare =====
   // "mail"   = Absenden öffnet ein Auswahl-Menü (Mail-App, Gmail, Outlook, WhatsApp) mit fertiger E-Mail.

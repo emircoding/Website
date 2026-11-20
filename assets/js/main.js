@@ -92,9 +92,12 @@
 
   /* ---------- mobile.de: kompletter Bestand eingebettet ---------- */
   function mobileDeEmbedUrl() {
-    if (C.mobileDeEmbed) return C.mobileDeEmbed;
-    var id = String(C.mobileDeCustomerId || "").trim();
-    return id ? "https://home.mobile.de/home/index.html?partnerHead=false&colorTheme=default&customerId=" + encodeURIComponent(id) : "";
+    // 1. Wahl: offizielle mobile.de-Einbindung über die Kunden-ID (lässt sich auf fremden Websites anzeigen).
+    //    Akzeptiert auch eine komplette mobile.de-Adresse, in der "customerId=…" vorkommt.
+    var m = /(\d{5,})/.exec(String(C.mobileDeCustomerId || ""));
+    if (m) return "https://home.mobile.de/home/index.html?partnerHead=false&colorTheme=default&customerId=" + m[1];
+    // 2. Wahl: eigener Einbindungs-Link (z. B. „Bestandslink“ aus dem mobile.de-Händlerbereich)
+    return String(C.mobileDeEmbed || "").trim();
   }
   function mobileDeEmbed() {
     var box = document.querySelector("[data-mde-embed]");
